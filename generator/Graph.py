@@ -49,9 +49,10 @@ def cartesian(
 
     # draw result
     page = canvas.Canvas(filename, pagesize=pagesize)
-    makeCartesianGrids(page=page, locations=frame_locs, size=(area_w, area_h), gridspace=gridspace,
-              checkered=checkered, gridline=gridline, boxline=boxline, 
-              checkeredcolor=checkeredcolor, gridcolor=gridcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
+    makeCartesianGrids(
+            page=page, locations=frame_locs, size=(area_w, area_h), gridspace=gridspace,
+            checkered=checkered, gridline=gridline, boxline=boxline, checkeredcolor=checkeredcolor,
+            gridcolor=gridcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
     placeLogo(margins, pagesize, canvas, quadrant=4)
 
     page.setTitle("Cartesian Graph Paper by Give Sheet")
@@ -121,7 +122,7 @@ def makeCartesianGrids(
         frame.addFromList([table], page)
 
 def dotted(
-        filename, pagesize=letter, margins=0.5 * inch, spacer=0.25 * inch, gridspace=0.25 * inch,
+        filename, pagesize=letter, margins=0.5*inch, spacer=0.25*inch, gridspace=0.25*inch,
         dotsize=1*mm, boxline=0, dotcolor=80, boxcolor=80, bgndcolor=0,
         layout=(1, 1), **excessParams):
     """
@@ -161,9 +162,8 @@ def dotted(
     # draw result
     page = canvas.Canvas(filename, pagesize=pagesize)
     makeDottedGrids(
-        page=page, locations=frame_locs, size=(area_w, area_h),
-        gridspace=gridspace, dotsize=dotsize, boxline=boxline,
-        dotcolor=dotcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
+            page=page, locations=frame_locs, size=(area_w, area_h), gridspace=gridspace,
+            dotsize=dotsize, boxline=boxline, dotcolor=dotcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
     placeLogo(margins, pagesize, canvas, quadrant=4)
 
     page.setTitle("Dotted Graph Paper by Give Sheet")
