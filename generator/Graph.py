@@ -53,6 +53,11 @@ def cartesian(
               checkered=checkered, gridline=gridline, boxline=boxline, 
               checkeredcolor=checkeredcolor, gridcolor=gridcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
     placeLogo(margins, pagesize, canvas, quadrant=4)
+
+    page.setTitle("Cartesian Graph Paper by Give Sheet")
+    page.setAuthor("Andre Aboulian via Give Sheet")
+    page.setSubject("Page Template")
+    page.setKeywords(['graph','cartesian','givesheet','pdf','grid','template','paper'])
     page.save()
 
 def makeGrids(
