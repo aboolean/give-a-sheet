@@ -49,8 +49,9 @@ def cartesian(
 
     # draw result
     page = canvas.Canvas(filename, pagesize=pagesize)
-    makeGrids(page, frame_locs, (area_w, area_h), gridspace, checkered, gridline,
-              boxline, checkeredcolor, gridcolor, boxcolor, bgndcolor)
+    makeGrids(page=page, locations=frame_locs, size=(area_w, area_h), gridspace=gridspace,
+              checkered=checkered, gridline=gridline, boxline=boxline, 
+              checkeredcolor=checkeredcolor, gridcolor=gridcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
     placeLogo(margins, pagesize, canvas, quadrant=4)
     page.save()
 
@@ -118,4 +119,4 @@ def polar():
 
 
 if __name__ == '__main__':
-    cartesian("output.pdf", gridspace=0.1*inch,bgndcolor=5, gridcolor=0, gridline=1, boxcolor=50, layout=(2,2))
+    cartesian("output.pdf", spacer=0.10*inch,gridspace=0.1*inch, bgndcolor=5, gridcolor=0, gridline=1, boxcolor=50, layout=(3,7))
