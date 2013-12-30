@@ -109,7 +109,7 @@ def makeCartesianGrids(
 
     # apply table style
     style = TableStyle(pattern)
-    style.add('GRID', (0, 0), (-1, -1), gridline, colors.CMYKColor(black=0.01 * gridcolor))
+    style.add('INNERGRID', (0, 0), (-1, -1), gridline, colors.CMYKColor(black=0.01 * gridcolor))
     if boxline != 0:
         style.add('BOX', (0, 0), (-1, -1), boxline, colors.CMYKColor(black=0.01 * boxcolor))
     table.setStyle(style)
@@ -237,5 +237,5 @@ def polar():
 
 
 if __name__ == '__main__':
-    # cartesian("output.pdf", spacer=0.10*inch,boxline=3,gridspace=0.1*inch, bgndcolor=5, gridcolor=0, gridline=1, boxcolor=50, layout=(3,7))
-    dotted("output.pdf",layout=(3,4),boxline=0,bgndcolor=5,gridspace=0.25*inch)
+    cartesian("output.pdf", spacer=0.10*inch,boxline=2,gridspace=0.1*inch, bgndcolor=5, gridcolor=0, gridline=1, boxcolor=50, layout=(3,7))
+    # dotted("output.pdf",layout=(3,4),boxline=0,bgndcolor=5,gridspace=0.25*inch)
