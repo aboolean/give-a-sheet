@@ -49,7 +49,7 @@ def cartesian(
 
     # draw result
     page = canvas.Canvas(filename, pagesize=pagesize)
-    makeCartesianGrids(
+    _makeCartesianGrids(
             page=page, locations=frame_locs, size=(area_w, area_h), gridspace=gridspace,
             checkered=checkered, gridline=gridline, boxline=boxline, checkeredcolor=checkeredcolor,
             gridcolor=gridcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
@@ -61,7 +61,7 @@ def cartesian(
     page.setKeywords(['graph','cartesian','givesheet','pdf','grid','template','paper'])
     page.save()
 
-def makeCartesianGrids(
+def _makeCartesianGrids(
         page, locations, size, gridspace, checkered,
         gridline, boxline, checkeredcolor, gridcolor, boxcolor, bgndcolor,
         **excessParams):
@@ -161,7 +161,7 @@ def dotted(
 
     # draw result
     page = canvas.Canvas(filename, pagesize=pagesize)
-    makeDottedGrids(
+    _makeDottedGrids(
             page=page, locations=frame_locs, size=(area_w, area_h), gridspace=gridspace,
             dotsize=dotsize, boxline=boxline, dotcolor=dotcolor, boxcolor=boxcolor, bgndcolor=bgndcolor)
     placeLogo(margins, pagesize, canvas, quadrant=4)
@@ -172,7 +172,7 @@ def dotted(
     page.setKeywords(['graph','dotted','dots','givesheet','pdf','grid','template','paper'])
     page.save()
 
-def makeDottedGrids(
+def _makeDottedGrids(
         page, locations, size, gridspace, dotsize, boxline, dotcolor, boxcolor,
         bgndcolor, **excessParams):
     """
