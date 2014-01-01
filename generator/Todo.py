@@ -178,8 +178,7 @@ def _makeItemizedTodo(page, items, pagesize, margins, binding,
     quad_locs.append((margins, margins, left_table, True)) # QIII
     quad_locs.append((margins + area_w + 2*binding, margins, right_table, False)) # QIV
 
-    # draw individual graphs
-    for loc_x, loc_y, table, onLeft in quad_locs:
+    def _drawChart(loc_x, loc_y, table, onLeft):
         frame = Frame(loc_x, loc_y, area_w, area_h, showBoundary=0,
                       leftPadding=0, bottomPadding=0, rightPadding=0, topPadding=0)
         frame.addFromList([table], page)
@@ -190,18 +189,14 @@ def _makeItemizedTodo(page, items, pagesize, margins, binding,
         if onLeft:
             _drawWeekField(page, location=week_label_abs, size=(1.5*cell_w, 12))
 
+    # draw individual graphs
+    for loc_x, loc_y, table, onLeft in quad_locs:
+        _drawChart(loc_x, loc_y, table, onLeft)
+
     if coverpage:
         page.showPage()
         for loc_x, loc_y, table, onLeft in [quad_locs[0]] + [quad_locs[2]]: # QI AND QIII
-            frame = Frame(loc_x, loc_y, area_w, area_h, showBoundary=0,
-                          leftPadding=0, bottomPadding=0, rightPadding=0, topPadding=0)
-            frame.addFromList([table], page)
-            _drawListFields(page, origin=(loc_x+topic_label_size,loc_y), layout=(3,len(items)+1),
-                       size=(cell_w,cell_h))
-            week_label_abs = loc_x + topic_label_size + 0.5*cell_w, \
-                             loc_y + grid_h + days_label_size + 0.5*(key_size - 12)
-            if onLeft:
-                _drawWeekField(page, location=week_label_abs, size=(1.5*cell_w, 12))
+            _drawChart(loc_x, loc_y, table, onLeft)
 
 def _drawListFields(page, origin, layout, size, padding=2):
     """
