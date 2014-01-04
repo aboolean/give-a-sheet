@@ -47,7 +47,7 @@ from Logo import placeLogo
 # #####################################|####################################
 
 def weeklyTodo(
-        filename, items, pagesize=letter, margins=0.5*inch, booklet=0,
+        filename, items=None, pagesize=letter, margins=0.5*inch, booklet=0,
         binding=0.25*inch, gridline=0.7, gridcolor=20, **excessParams):
     """
     Generates a biweekly todo list booklet.
@@ -65,6 +65,10 @@ def weeklyTodo(
     # landscape orientation
     if not booklet:
         pagesize = pagesize[::-1]
+
+    # default to single list
+    if items == None or len(items) < 1:
+        items = ['']
 
     # canvas attributes
     page = canvas.Canvas(filename, pagesize=pagesize)
@@ -126,7 +130,7 @@ def _makeItemizedTodo(page, items, origin, targetsize, margins, binding,
                      (page_h - 2*margins)
     grid_w, grid_h = area_w - topic_label_size, \
                      area_h - key_size - days_label_size
-    cell_w, cell_h = grid_w / 3, grid_h / (len(items) + 1)
+    cell_w, cell_h = grid_w / 3, grid_h / (len(items))
 
     if grid_w < 0 or grid_h < 0:
         raise ValueError("The specified dimensions do no fit on the page.")
@@ -136,15 +140,15 @@ def _makeItemizedTodo(page, items, origin, targetsize, margins, binding,
     key_row_legend = ['','','[legend]','']
     days_row_left = ['', 'Monday', 'Tuesday', 'Wednesday']
     days_row_right = ['', 'Thursday', 'Friday', 'Weekend']
-    tasks_rows = [([item] + ['']*3) for item in (items + ['M'])]
+    tasks_rows = [([item] + ['']*3) for item in items]
 
     left_data = [key_row_week] + [days_row_left] + tasks_rows
     left_table = Table(left_data, colWidths=([topic_label_size] + [cell_w]*3),
-                       rowHeights=([key_size, days_label_size] + [cell_h]*(len(items)+1)))
+                       rowHeights=([key_size, days_label_size] + [cell_h]*(len(items))))
 
     right_data = [key_row_legend] + [days_row_right] + tasks_rows
     right_table = Table(right_data, colWidths=([topic_label_size] + [cell_w]*3),
-                        rowHeights=([key_size, days_label_size] + [cell_h]*(len(items)+1)))
+                        rowHeights=([key_size, days_label_size] + [cell_h]*(len(items))))
 
     # apply table style
     common_style = TableStyle()
