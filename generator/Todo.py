@@ -49,7 +49,7 @@ from Logo import placeLogo
 # #####################################|####################################
 
 def weeklyTodo(
-        filename, items=None, shading=None, pagesize=letter, margins=0.5*inch, booklet=0,
+        filename, items=None, shading=None, legend=None, pagesize=letter, margins=0.5*inch, booklet=0,
         binding=0.25*inch, gridline=0.7, gridcolor=20, **excessParams):
     """
     Generates a biweekly todo list booklet.
@@ -58,6 +58,7 @@ def weeklyTodo(
     filename -- output PDF document name
     items -- list of topics for a given week
     shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
+    legend -- list of 2-item tupes indicating grey value and label
     pagesize -- size of page as (width, height) tuple
     margins -- size of margins around page
     booklet -- flag to generate half-page booklet; full-page if false
@@ -94,20 +95,23 @@ def weeklyTodo(
 
     # generate pages
     if booklet:
-        _makeItemizedTodo(page=page, items=items, shading=shading, origin=(0,0), targetsize=(page_w,page_h/2),
-                          margins=margins, binding=binding, gridline=gridline, gridcolor=gridcolor)
-        _makeItemizedTodo(page=page, items=items, shading=shading, origin=(0,page_h/2), targetsize=(page_w,page_h/2),
-                          margins=margins, binding=binding, gridline=gridline, gridcolor=gridcolor)
+        _makeItemizedTodo(
+            page=page, items=items, shading=shading, legend=legend, origin=(0,0),targetsize=(page_w,page_h/2),
+            margins=margins, binding=binding, gridline=gridline, gridcolor=gridcolor)
+        _makeItemizedTodo(
+            page=page, items=items, shading=shading, legend=legend, origin=(0,page_h/2), targetsize=(page_w,page_h/2),
+            margins=margins, binding=binding, gridline=gridline, gridcolor=gridcolor)
         placeLogo(margins, pagesize, canvas, quadrant=1)
         placeLogo(margins, pagesize, canvas, quadrant=4)
     else:
-        _makeItemizedTodo(page=page, items=items, shading=shading, origin=(0,0), targetsize=pagesize,
-                          margins=margins, binding=binding, gridline=gridline, gridcolor=gridcolor)
+        _makeItemizedTodo(
+            page=page, items=items, shading=shading, legend=legend, origin=(0,0), targetsize=pagesize,
+            margins=margins, binding=binding, gridline=gridline, gridcolor=gridcolor)
         placeLogo(margins, pagesize, canvas, quadrant=4)
 
     page.save()
 
-def _makeItemizedTodo(page, items, shading, origin, targetsize, margins, binding,
+def _makeItemizedTodo(page, items, shading, legend, origin, targetsize, margins, binding,
                      gridline, gridcolor, **excessParams):
     """
     Creates a single week of an itemized todo list.
@@ -116,6 +120,7 @@ def _makeItemizedTodo(page, items, shading, origin, targetsize, margins, binding
     page -- a Canvas instance on which to draw
     items -- list of topics for a given week
     shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
+    legend -- list of 2-item tupes indicating grey value and label
     origin -- origin of drawing area as (x, y) tuple
     targetsize -- size of target drawing area as (width, height) tuple
     margins -- size of margins around page
@@ -173,20 +178,37 @@ def _makeItemizedTodo(page, items, shading, origin, targetsize, margins, binding
     if grid_w < 0 or grid_h < 0:
         raise ValueError("The specified dimensions do not fit on the page.")
 
+    # create legend
+    if legend != None:
+        legend_data = [[label for grey, label in legend]]
+        legend_table = Table(legend_data, colWidths=(2*(cell_w)/len(legend)),
+                             rowHeights=12)
+        legend_table.setStyle(
+            TableStyle([('FONT', (0,0), (-1,0), 'OstrichSans', 10),
+                        ('ALIGN', (0,0), (-1,0), 'CENTER'),
+                        ('VALIGN', (0,0), (-1,0), 'MIDDLE'),
+                        ('BOX', (0,0), (-1,0), gridline/2, colors.CMYKColor(black=0.01 * gridcolor)),
+                        ]))
+
+        legend_shading = TableStyle()
+        for i, (grey, label) in enumerate(legend):
+            legend_shading.add('BACKGROUND', (i,0), (i,0), colors.CMYKColor(black=0.01 * grey))
+        legend_table.setStyle(legend_shading)
+
     # create plain table
     key_row_week = ['','Week:','','']
-    key_row_legend = ['','','[legend]','']
+    key_row_legend = ['','',legend_table,''] if legend != None else ['']*4
     days_row_left = ['', 'Monday', 'Tuesday', 'Wednesday']
     days_row_right = ['', 'Thursday', 'Friday', 'Weekend']
     tasks_rows = [['']*4]*len(items)
 
     left_data = [key_row_week] + [days_row_left] + tasks_rows
     left_table = Table(left_data, colWidths=([topic_label_size_padded] + [cell_w]*3),
-                       rowHeights=([key_size, days_label_size] + [cell_h]*(len(items))))
+                       rowHeights=([key_size, days_label_size] + [cell_h]*len(items)))
 
     right_data = [key_row_legend] + [days_row_right] + tasks_rows
     right_table = Table(right_data, colWidths=([topic_label_size_padded] + [cell_w]*3),
-                        rowHeights=([key_size, days_label_size] + [cell_h]*(len(items))))
+                        rowHeights=([key_size, days_label_size] + [cell_h]*len(items)))
 
     # apply table style
     common_style = TableStyle()
@@ -234,9 +256,6 @@ def _makeItemizedTodo(page, items, shading, origin, targetsize, margins, binding
     right_table.setStyle(right_shading)
     right_table.setStyle(
             TableStyle([('SPAN', (2,0), (3,0)),
-                        # ('LINEABOVE', (2,0), (3,0), gridline, colors.CMYKColor(black=0.01 * gridcolor)),
-                        # ('LINEAFTER', (3,0), (3,0), gridline, colors.CMYKColor(black=0.01 * gridcolor)),
-                        # ('LINEBEFORE', (2,0), (2,0), gridline, colors.CMYKColor(black=0.01 * gridcolor)),
                         ('ALIGN', (2,0), (2,0), 'CENTER'),
                         ('VALIGN', (2,0), (2,0), 'MIDDLE'),
                         ]))
@@ -312,4 +331,6 @@ if __name__ == '__main__':
                 [l,0,l,0,0,0],
                 [0,l,0,0,0,0],
                 [0,0,0,0,0,0]  ]
-    weeklyTodo("output.pdf",items=['6.002','6.004','6.006','6.831','4.341','21W.789','Miscellanea'][::-1], shading=shading,booklet=0)
+    legend = [(r, 'recitation'),(l,'lecture')]
+    weeklyTodo("output.pdf",items=['6.002','6.004','6.006','6.831','4.341','21W.789','Miscellanea'][::-1], 
+               shading=shading, legend=legend, booklet=0)
