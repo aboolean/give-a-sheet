@@ -87,8 +87,9 @@ def weeklyTodo(
                       'givesheet','pdf','grid','template','paper'])
 
     _registerFonts([("LearningCurve", "support/fonts/learning_curve/LearningCurve.ttf"),
-                   ("OstrichSans", "support/fonts/ostrich/OstrichSans-Medium.ttf"),
-                   ("OstrichSans-Bold", "support/fonts/ostrich/OstrichSans-Black.ttf"),
+                   ("FreeUniversal", "support/fonts/free_universal/FreeUniversal-Regular.ttf"),
+                   ("FreeUniversal-Bold", "support/fonts/free_universal/FreeUniversal-Bold.ttf"),
+                   ("FreeUniversal-Italic", "support/fonts/free_universal/FreeUniversal-Italic.ttf"),
                    ])
 
     page_w, page_h = pagesize
@@ -129,11 +130,15 @@ def _makeItemizedTodo(page, items, shading, legend, origin, targetsize, margins,
     gridcolor -- color of grid lines around cells
     """
     page.saveState()
-
     page.translate(*origin)
 
+    # fonts
+    font_days = 'FreeUniversal-Bold'
+    font_legend = 'FreeUniversal'
+    font_topics = 'FreeUniversal-Italic'
+
     # dimensions and layout
-    key_size = 20
+    key_size = 24
     days_label_size = 12
     topic_padding = 2
 
@@ -155,7 +160,7 @@ def _makeItemizedTodo(page, items, shading, legend, origin, targetsize, margins,
     topic_style.fontSize = 10
     topic_style.leading = 12
     topic_style.alignment=TA_CENTER
-    topic_style.fontName = 'OstrichSans'
+    topic_style.fontName = font_topics
     topic_style.splitLongWords = 1
 
     topics = list() # (topic, wrap_length)
@@ -181,10 +186,10 @@ def _makeItemizedTodo(page, items, shading, legend, origin, targetsize, margins,
     # create legend
     if legend != None:
         legend_data = [[label for grey, label in legend]]
-        legend_table = Table(legend_data, colWidths=(2*(cell_w)/len(legend)),
-                             rowHeights=12)
+        legend_table = Table(legend_data, colWidths=(min(2*cell_w/len(legend), cell_w)),
+                             rowHeights=(key_size - 10))
         legend_table.setStyle(
-            TableStyle([('FONT', (0,0), (-1,0), 'OstrichSans', 10),
+            TableStyle([('FONT', (0,0), (-1,0), font_legend, 10),
                         ('ALIGN', (0,0), (-1,0), 'CENTER'),
                         ('VALIGN', (0,0), (-1,0), 'MIDDLE'),
                         ('BOX', (0,0), (-1,0), gridline/2, colors.CMYKColor(black=0.01 * gridcolor)),
@@ -216,9 +221,7 @@ def _makeItemizedTodo(page, items, shading, legend, origin, targetsize, margins,
     common_style.add('VALIGN', (0,1), (-1,-1), 'MIDDLE')
     common_style.add('ALIGN', (0,1), (-1,-1), 'CENTER')
 
-    common_style.add('FONT', (1,1), (-1,1), 'OstrichSans-Bold', 10) # days
-    common_style.add('FONT', (0,2), (0,-1), 'OstrichSans', 10) # topics
-    common_style.add('ROTATE', (0,2), (0,-1), 90) # topics
+    common_style.add('FONT', (1,1), (-1,1), font_days, 10) # days
 
     common_style.add('GRID', (0,2), (0,-1), gridline, colors.CMYKColor(black=0.01 * gridcolor)) # topics
     common_style.add('GRID', (1,1), (-1,1), gridline, colors.CMYKColor(black=0.01 * gridcolor)) # days
@@ -320,17 +323,3 @@ def _registerFonts(fontlist):
         selfPath = path.dirname(path.abspath(getfile(currentframe())))
         ttfFile = selfPath + sep + relpath
         pdfmetrics.registerFont(TTFont(fontname, ttfFile))
-
-
-if __name__ == '__main__':
-    r, l = 4, 6 # rec and lec shading colors
-    shading = [ [0,l,r,l,r,0],
-                [0,l,r,l,r,0],
-                [0,l,r,l,r,0],
-                [l,0,l,0,l,0],
-                [l,0,l,0,0,0],
-                [0,l,0,0,0,0],
-                [0,0,0,0,0,0]  ]
-    legend = [(r, 'recitation'),(l,'lecture')]
-    weeklyTodo("output.pdf",items=['6.002','6.004','6.006','6.831','4.341','21W.789','Miscellanea'][::-1], 
-               shading=shading, legend=legend, booklet=0)
