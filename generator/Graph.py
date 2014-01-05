@@ -123,7 +123,7 @@ def _makeCartesianGrids(
 
 def dotted(
         filename, pagesize=letter, margins=0.5*inch, spacer=0.25*inch, gridspace=0.25*inch,
-        dotsize=1*mm, boxline=0, dotcolor=80, boxcolor=80, bgndcolor=0,
+        dotsize=0.5*mm, boxline=0, dotcolor=50, boxcolor=80, bgndcolor=0,
         layout=(1, 1), **excessParams):
     """
     Generates a page of vertex-dotted grid paper.
