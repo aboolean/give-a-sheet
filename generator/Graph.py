@@ -232,9 +232,6 @@ def _makeDottedGrids(
                 y += gridspace
             x += gridspace
 
-def polar():
-    pass
-
 
 if __name__ == '__main__':
     cartesian("output.pdf", spacer=0.10*inch,boxline=2,gridspace=0.1*inch, bgndcolor=5, gridcolor=0, gridline=1, boxcolor=50, layout=(3,7))
