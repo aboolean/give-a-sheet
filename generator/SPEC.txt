@@ -7,9 +7,10 @@ pagesize -- size of page as (width, height) tuple
 margins -- size of margins around page
 spacer -- size of spacing between graphs
 gridspace -- size of individual grid cells
-checkered -- true for checkered grid
 gridline -- thickness of lines around cells
 boxline -- thickness of border around graph(s), 0 for no box
+checkered -- true for checkered grid
+rainbow -- true for rainbow grid coloring
 checkeredcolor -- color of checkered boxes
 gridcolor -- color of grid lines around cells
 boxcolor -- color of box surrounding graph(s)
@@ -27,6 +28,7 @@ spacer -- size of spacing between grids (if multiple)
 gridspace -- size of individual grid cells, space between dots
 dotsize -- diameter of each individual dot
 boxline -- thickness of border around graph(s), 0 for no box
+rainbow -- true for rainbow dot coloring
 dotcolor -- color of dot at each cell vertex
 boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of grid background
@@ -38,12 +40,38 @@ Generates a biweekly todo list booklet.
 Keyword arguments:
 filename -- output PDF document name
 items -- list of topics for a given week
-shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
-legend -- list of 2-item tupes indicating grey value and label
 pagesize -- size of page as (width, height) tuple
 margins -- size of margins around page
-booklet -- flag to generate half-page booklet; full-page if false
-binding -- size of spacing between list and binding on each page
+halfpage -- two half-page duplicates (portrait), else one full-page spread (landscape)
+booklet -- flag to split columns evenly among two pages, along with left labels
+binding -- size of spacing between designated pages; ignored if 'booklet' is false
+includeweekend -- includes column(s) for weekend, else includes weekdays only and a single notes column
+collapseweekend -- Sat and Sun are collapsed into a single 'Weekend' column and notes column is omitted; ignored if 'includeweekend' is false
 gridline -- thickness of lines around cells
 gridcolor -- color of grid lines around cells
-    
+
+Future features:
+shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
+legend -- list of 2-item tupes indicating grey value and label
+
+#### WEEKLY SCHEDULE ####
+Generates a time-based schedule planner.
+
+Keyword arguments:
+filename -- output PDF document name
+timerange -- range of times for a give day in a (start, stop) tuple of hours in range [0,23]
+twentyfour -- time displayed as hour in range [0,23], else AM and PM used
+pagesize -- size of page as (width, height) tuple
+margins -- size of margins around page
+halfpage -- two half-page duplicates (portrait), else one full-page spread (landscape)
+booklet -- flag to split columns evenly among two pages, along with left labels
+binding -- size of spacing between designated pages; ignored if 'booklet' is false
+includeweekend -- includes column(s) for weekend, else includes weekdays only and a single notes column
+collapseweekend -- Sat and Sun are collapsed into a single 'Weekend' column and notes column is omitted; ignored if 'includeweekend' is false
+gridline -- thickness of  lines around cells
+gridcolor -- color of grid lines around cells
+
+Future features:
+startdate -- specific start date for the week; week will begin on day of specified date
+
+
