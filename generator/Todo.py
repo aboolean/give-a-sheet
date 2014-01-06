@@ -83,7 +83,7 @@ def weeklyTodo(
     page.setTitle("Weekly Todo List by Give Sheet")
     page.setAuthor("Andre Aboulian via Give Sheet")
     page.setSubject("Page Template")
-    page.setKeywords(['weekly','biweekly','todo','itemized','planner','schedule',
+    page.setKeywords(['weekly','itemized','todo','itemized','planner','schedule',
                       'givesheet','pdf','grid','template','paper'])
 
     _registerFonts([("LearningCurve", "support/fonts/learning_curve/LearningCurve.ttf"),
@@ -247,7 +247,7 @@ def _makeItemizedTodo(page, items, shading, legend, origin, targetsize, margins,
     left_table.setStyle(left_shading)
     left_table.setStyle(
             TableStyle([('SPAN', (1,0), (2,0)),
-                        ('FONT', (1,0), (1,0), 'LearningCurve', 16),
+                        ('FONT', (1,0), (1,0), 'LearningCurve', 18),
                         ('LINEABOVE', (1,0), (2,0), gridline, colors.CMYKColor(black=0.01 * gridcolor)),
                         ('LINEAFTER', (2,0), (2,0), gridline, colors.CMYKColor(black=0.01 * gridcolor)),
                         ('LINEBEFORE', (1,0), (1,0), gridline, colors.CMYKColor(black=0.01 * gridcolor)),
