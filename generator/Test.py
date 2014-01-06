@@ -1,33 +1,25 @@
-from Graph import cartesian, dotted, polar
+from Graph import cartesian, dotted
 from Todo import weeklyTodo
 
 if __name__ == '__main__':
-    # weeklyTodo
+    # itemizedTodo
     """
     Generates a biweekly todo list booklet.
 
     Keyword arguments:
     filename -- output PDF document name
     items -- list of topics for a given week
-    shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
-    legend -- list of 2-item tupes indicating grey value and label
     pagesize -- size of page as (width, height) tuple
     margins -- size of margins around page
-    booklet -- flag to generate half-page booklet; full-page if false
-    binding -- size of spacing between list and binding on each page
+    halfpage -- two half-page duplicates (portrait), else one full-page spread (landscape)
+    booklet -- flag to split columns evenly among two pages, along with left labels
+    binding -- size of spacing between designated pages; ignored if 'booklet' is false
+    includeweekend -- includes column(s) for weekend, else includes weekdays only and a single notes column
+    collapseweekend -- Sat and Sun are collapsed into a single 'Weekend' column and notes column is omitted; ignored if 'includeweekend' is false
     gridline -- thickness of lines around cells
     gridcolor -- color of grid lines around cells
     """
-    r, l = 5, 9 # rec and lec shading colors
-    shading = [ [0,l,r,l,r,0],
-                [0,l,r,l,r,0],
-                [0,l,r,l,r,0],
-                [l,0,l,0,l,0],
-                [l,0,l,0,0,0],
-                [0,l,0,0,0,0],
-                [0,0,0,0,0,0]  ]
-    legend = [(r, 'Recitation'),(l,'Lecture')]
-    weeklyTodo("output.pdf",items=['6.002','6.004','6.006','6.831','4.341','21W.789','Miscellanea'][::-1], shading=shading, legend=legend, gridcolor=60, gridline=1, booklet=0)
+    
 
     # cartesian
     """
