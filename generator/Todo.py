@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import math
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
@@ -12,6 +13,7 @@ from reportlab.pdfbase.pdfform import textFieldAbsolute
 
 from Logo import placeLogo
 from Coloring import grey
+from Support import registerFonts
 
 
 # ASCII Model
@@ -83,21 +85,31 @@ def itemizedTodo(
     gridcolor -- color of grid lines around cells
     """
 
-    # landscape orientation
+    # full spread: landscape orientation
 
-    if not booklet:
+    if not halfpage:
         pagesize = pagesize[::-1]
+
+    (page_w, page_h) = pagesize
 
     # default to single list
 
     if items == None or len(items) < 1:
         items = ['']
 
-    # check shading pattern
+    # delermine columns
 
-    if shading != None and (len(shading) != len(items) or not type(shading[0])
-                            == list or len(shading[0]) != 6):
-        raise ValueError('Shading pattern misformed.')
+    weekday_labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+    if includeweekend:
+        if collapseweekend:
+            day_labels = weekday_labels + ['Weekend']
+        else:
+            day_labels = weekday_labels + ['Saturday', 'Sunday'] + ['Notes']
+    else:
+        day_labels = weekday_labels + ['Notes']
+
+    day_labels_left = day_labels[:len(day_labels) / 2]
+    day_labels_right = day_labels[len(day_labels) / 2:]
 
     # canvas attributes
 
@@ -109,7 +121,6 @@ def itemizedTodo(
         'weekly',
         'itemized',
         'todo',
-        'itemized',
         'planner',
         'schedule',
         'givesheet',
@@ -119,73 +130,116 @@ def itemizedTodo(
         'paper',
         ])
 
-    _registerFonts([('LearningCurve',
-                   'support/fonts/learning_curve/LearningCurve.ttf'),
-                   ('FreeUniversal',
-                   'support/fonts/free_universal/FreeUniversal-Regular.ttf'),
-                   ('FreeUniversal-Bold',
-                   'support/fonts/free_universal/FreeUniversal-Bold.ttf'),
-                   ('FreeUniversal-Italic',
-                   'support/fonts/free_universal/FreeUniversal-Italic.ttf')])
+    # register fonts
 
-    (page_w, page_h) = pagesize
+    registerFonts([('LearningCurve',
+                  'support/fonts/learning_curve/LearningCurve.ttf'),
+                  ('FreeUniversal',
+                  'support/fonts/free_universal/FreeUniversal-Regular.ttf'),
+                  ('FreeUniversal-Bold',
+                  'support/fonts/free_universal/FreeUniversal-Bold.ttf'),
+                  ('FreeUniversal-Italic',
+                  'support/fonts/free_universal/FreeUniversal-Italic.ttf')])
 
-    # generate pages
+    # dimensions and layout
 
-    if booklet:
-        _makeItemizedTodo(
-            page=page,
-            items=items,
-            shading=shading,
-            legend=legend,
-            origin=(0, 0),
-            targetsize=(page_w, page_h / 2),
-            margins=margins,
-            binding=binding,
-            gridline=gridline,
-            gridcolor=gridcolor,
-            )
-        _makeItemizedTodo(
-            page=page,
-            items=items,
-            shading=shading,
-            legend=legend,
-            origin=(0, page_h / 2),
-            targetsize=(page_w, page_h / 2),
-            margins=margins,
-            binding=binding,
-            gridline=gridline,
-            gridcolor=gridcolor,
-            )
-        placeLogo(margins, pagesize, canvas, quadrant=1)
-        placeLogo(margins, pagesize, canvas, quadrant=4)
+    key_h = 24
+    key_w = 4*key_h
+    key_spacer_above = 0  # space between 'Week' and top margin
+    key_spacer_below = 2  # space between 'Week' and grid beneath
+    key_spacer_indent = 2  # space between 'Week' and left margin
+
+    # grid placement
+
+    grids = list()
+
+    if halfpage:
+
+        # orgin -- lower left corner
+        # area -- space occupied by week layout
+        # grid -- space occupied by individual grids
+
+        (area_w, area_h) = (page_w - 2 * margins, (page_h - 4 * margins) / 2)
+        grid_h = area_h - key_h - key_spacer_above - key_spacer_below
+
+        if booklet:  # half page booklet
+            grid_w = area_w - 2 * binding
+            origin_bottom_left = (margins, margins)
+            origin_bottom_right = (page_w / 2 + binding, margins)
+            origin_top_left = (margins, page_h / 2 + margins)
+            origin_top_right = (page_w / 2 + binding, page_h / 2 + margins)
+            grid_size = (grid_w, grid_h)
+
+            grids.append((origin_bottom_left, grid_size, day_labels_left))
+            grids.append((origin_bottom_right, grid_size, day_labels_right))
+            grids.append((origin_top_left, grid_size, day_labels_left))
+            grids.append((origin_top_right, grid_size, day_labels_right))
+        else:
+
+              # half page spread
+
+            origin_bottom = (margins, margins)
+            origin_top = (margins, page_h / 2 + margins)
+
+            grids.append((origin_top, (grid_h, area_h), day_labels))
+
+        placeLogo(margins, pagesize, page, quadrant=1)
+        placeLogo(margins, pagesize, page, quadrant=4)
     else:
-        _makeItemizedTodo(
+        (area_w, area_h) = (page_w - 2 * margins, page_h - 2 * margins)
+        grid_h = area_h - key_h - key_spacer_above - key_spacer_below
+
+        if booklet:  # full page booklet
+            grid_w = area_w - 2 * binding
+            origin_left = (margins, margins)
+            origin_right = (page_w / 2 + binding, margins)
+
+            grids.append((origin_left, (grid_w, grid_h), day_labels_left))
+            grids.append((origin_right, (grid_w, grid_h), day_labels_right))
+        else:
+
+              # full page spread
+
+            grids.append(((margins, margins), (grid_h, area_w), day_labels))
+
+        placeLogo(margins, pagesize, page, quadrant=4)
+
+    # draw grids
+
+    for (origin, size, days) in grids:
+        _makeGrid(
             page=page,
             items=items,
-            shading=shading,
-            legend=legend,
-            origin=(0, 0),
-            targetsize=pagesize,
-            margins=margins,
-            binding=binding,
+            days=days,
+            origin=origin,
+            size=size,
             gridline=gridline,
             gridcolor=gridcolor,
             )
-        placeLogo(margins, pagesize, canvas, quadrant=4)
+
+    # draw 'Week' boxes
+
+    def _makeWeekBox(origin):
+        # size (key_h, 4*key_w)
+        page.circle(origin[0], origin[1], 2)
+
+    key_offset = margins + key_spacer_above + key_h
+    if halfpage:
+        _makeWeekBox((margins + key_spacer_indent, page_h - key_offset)) # top
+        _makeWeekBox((margins + key_spacer_indent, page_h/2 - key_offset)) # bottom
+    else:
+        _makeWeekBox((margins + key_spacer_indent, page_h - key_offset))
+
+    # finalize document
 
     page.save()
 
-
-def _makeItemizedTodo(
+def _makeGrid(
     page,
     items,
-    shading,
-    legend,
+    days,
     origin,
-    targetsize,
-    margins,
-    binding,
+    size,
     gridline,
     gridcolor,
     **excessParams
@@ -196,12 +250,9 @@ def _makeItemizedTodo(
     Keyword arguments:
     page -- a Canvas instance on which to draw
     items -- list of topics for a given week
-    shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
-    legend -- list of 2-item tupes indicating grey value and label
+    days -- list of day labels; 'Notes' creates a formatted note column
     origin -- origin of drawing area as (x, y) tuple
-    targetsize -- size of target drawing area as (width, height) tuple
-    margins -- size of margins around page
-    binding -- size of spacing between list and binding on each page
+    size -- size of grid as (width, height) tuple
     gridline -- thickness of lines around cells
     gridcolor -- color of grid lines around cells
     """
@@ -210,22 +261,17 @@ def _makeItemizedTodo(
     page.translate(*origin)
 
     # fonts
-
-    font_days = 'FreeUniversal-Bold'
-    font_legend = 'FreeUniversal'
     font_topics = 'FreeUniversal-Italic'
+    font_days = 'FreeUniversal-Bold'
 
     # dimensions and layout
 
-    key_size = 24
     days_label_size = 12
     topic_padding = 2
 
-    (page_w, page_h) = targetsize
-    (area_w, area_h) = ((page_w - 2 * margins - 2 * binding) / 2, page_h - 2
-                        * margins)
-    grid_h = area_h - key_size - days_label_size
-    cell_h = grid_h / len(items)
+    (area_w, area_h) = size
+    inner_h = area_h - days_label_size
+    cell_h = inner_h / len(items)
 
         # check topic length
 
@@ -260,142 +306,76 @@ def _makeItemizedTodo(
 
     topic_label_size_padded = topic_label_size + 2 * topic_padding  # add padding
 
-    grid_w = area_w - topic_label_size_padded
-    cell_w = grid_w / 3
+    inner_w = area_w - topic_label_size_padded
+    cell_w = inner_w / len(days)
 
-    if grid_w < 0 or grid_h < 0:
-        raise ValueError('The specified dimensions do not fit on the page.')
-
-    # create legend
-
-    if legend != None:
-        legend_data = [[label for (grey, label) in legend]]
-        legend_table = Table(legend_data, colWidths=min(2 * cell_w
-                             / len(legend), cell_w), rowHeights=key_size - 10)
-        legend_table.setStyle(TableStyle([('FONT', (0, 0), (-1, 0),
-                              font_legend, 10), ('ALIGN', (0, 0), (-1, 0),
-                              'CENTER'), ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
-                              ('BOX', (0, 0), (-1, 0), gridline / 2,
-                              grey(gridcolor))]))
-
-        legend_shading = TableStyle()
-        for (i, (grey, label)) in enumerate(legend):
-            legend_shading.add('BACKGROUND', (i, 0), (i, 0), grey(grey))
-        legend_table.setStyle(legend_shading)
+    if inner_w < 0 or inner_h < 0:
+        raise ValueError('Specified dimensions do not fit on page.')
 
     # create plain table
 
-    key_row_week = ['', 'Week:', '', '']
-    key_row_legend = (['', '', legend_table, ''] if legend != None else ['']
-                      * 4)
-    days_row_left = ['', 'Monday', 'Tuesday', 'Wednesday']
-    days_row_right = ['', 'Thursday', 'Friday', 'Weekend']
-    tasks_rows = [[''] * 4] * len(items)
+    days_row = [[''] + days]
+    tasks_rows = [[''] * (1 + len(days))] * len(items)
 
-    left_data = [key_row_week] + [days_row_left] + tasks_rows
-    left_table = Table(left_data, colWidths=[topic_label_size_padded]
-                       + [cell_w] * 3, rowHeights=[key_size, days_label_size]
-                       + [cell_h] * len(items))
-
-    right_data = [key_row_legend] + [days_row_right] + tasks_rows
-    right_table = Table(right_data, colWidths=[topic_label_size_padded]
-                        + [cell_w] * 3, rowHeights=[key_size, days_label_size]
-                        + [cell_h] * len(items))
+    data = days_row + tasks_rows
+    col_w = [topic_label_size_padded] + [cell_w] * len(days)
+    row_h = [days_label_size] + [cell_h] * len(items)
+    table = Table(data, colWidths=col_w, rowHeights=row_h)
 
     # apply table style
 
-    common_style = TableStyle()
+    table_style = TableStyle()
 
-    common_style.add('VALIGN', (0, 1), (-1, -1), 'MIDDLE')
-    common_style.add('ALIGN', (0, 1), (-1, -1), 'CENTER')
+    table_style.add('VALIGN', (1, 0), (-1, 0), 'MIDDLE')
+    table_style.add('ALIGN', (1, 0), (-1, 0), 'CENTER')
 
-    common_style.add('FONT', (1, 1), (-1, 1), font_days, 10)  # days
+    table_style.add('FONT', (1, 0), (-1, 0), font_days, 10)  # days
 
-    common_style.add('GRID', (0, 2), (0, -1), gridline, grey(gridcolor))  # topics
-    common_style.add('GRID', (1, 1), (-1, 1), gridline, grey(gridcolor))  # days
-    common_style.add('LINEBELOW', (1, -1), (-1, -1), gridline, grey(gridcolor))  # bottom
-    common_style.add('LINEAFTER', (-1, 2), (-1, -1), gridline, grey(gridcolor))  # right
-    common_style.add('INNERGRID', (1, 2), (-1, -1), gridline / 2,
-                     grey(gridcolor / 2))
+    table_style.add('GRID', (0, 1), (0, -1), gridline, grey(gridcolor))  # topics
+    table_style.add('GRID', (1, 0), (-1, 0), gridline, grey(gridcolor))  # days
+    table_style.add('LINEBELOW', (1, -1), (-1, -1), gridline, grey(gridcolor))  # bottom
+    table_style.add('LINEAFTER', (-1, 1), (-1, -1), gridline, grey(gridcolor))  # right
+    table_style.add('INNERGRID', (1, 1), (-1, -1), gridline / 2,
+                     grey(gridcolor))
 
-        # apply shading
+    table.setStyle(table_style)
 
-    (left_shading, right_shading) = (TableStyle(), TableStyle())
-    if shading != None:
-        for row in xrange(len(shading)):
-            for col in xrange(6):
-                grey = shading[row][col]
-                if type(grey) == float or type(grey) == int:
-                    (x, y) = (col + 1, row + 2)  # headings and labels compensation
-                    if col < 3:
-                        left_shading.add('BACKGROUND', (x, y), (x, y),
-                                grey(grey))
-                    else:
-                        x -= 3  # right table compensation
-                        right_shading.add('BACKGROUND', (x, y), (x, y),
-                                grey(grey))
+    # draw table
 
-    left_table.setStyle(common_style)
-    left_table.setStyle(left_shading)
-    left_table.setStyle(TableStyle([
-        ('SPAN', (1, 0), (2, 0)),
-        ('FONT', (1, 0), (1, 0), 'LearningCurve', 18),
-        ('LINEABOVE', (1, 0), (2, 0), gridline, grey(gridcolor)),
-        ('LINEAFTER', (2, 0), (2, 0), gridline, grey(gridcolor)),
-        ('LINEBEFORE', (1, 0), (1, 0), gridline, grey(gridcolor)),
-        ('ALIGN', (1, 0), (1, 0), 'LEFT'),
-        ('VALIGN', (1, 0), (1, 0), 'MIDDLE'),
-        ]))
+    (x_o, y_o) = origin
+    frame = Frame(
+        x_o,
+        y_o,
+        area_w,
+        area_h,
+        leftPadding=0,
+        bottomPadding=0,
+        rightPadding=0,
+        topPadding=0,
+        )
+    frame.addFromList([table], page)
 
-    right_table.setStyle(common_style)
-    right_table.setStyle(right_shading)
-    right_table.setStyle(TableStyle([('SPAN', (2, 0), (3, 0)), ('ALIGN', (2,
-                         0), (2, 0), 'CENTER'), ('VALIGN', (2, 0), (2, 0),
-                         'MIDDLE')]))
-
-    def _drawTable(table, location):
-        (loc_x, loc_y) = location
+    # draw topics
+    page.rotate(90)  # rotated (y, -x)
+    for (i, (topic, wrap_length)) in enumerate(topics):
+        middle_comp = 0.5 * (topic_label_size - wrap_length)
+        (loc_x, loc_y) = (y_o + i * cell_h, -(x_o + topic_label_size_padded
+                          - middle_comp))
         frame = Frame(
             loc_x,
             loc_y,
-            area_w,
-            area_h,
+            cell_h,
+            wrap_length + 2 * topic_padding,
             showBoundary=0,
-            leftPadding=0,
-            bottomPadding=0,
-            rightPadding=0,
-            topPadding=0,
+            leftPadding=topic_padding,
+            rightPadding=topic_padding,
+            topPadding=topic_padding,
+            bottomPadding=topic_padding,
             )
-        frame.addFromList([table], page)
+        frame.addFromList([topic], page)
+    page.rotate(-90)
 
-    def _drawTopics(location):
-        (x_o, y_o) = location
-        page.rotate(90)  # rotated (y, -x)
-        for (i, (topic, wrap_length)) in enumerate(topics):
-            middle_comp = 0.5 * (topic_label_size - wrap_length)
-            (loc_x, loc_y) = (y_o + i * cell_h, -(x_o + topic_label_size_padded
-                              - middle_comp))
-            frame = Frame(
-                loc_x,
-                loc_y,
-                cell_h,
-                wrap_length + 2 * topic_padding,
-                leftPadding=topic_padding,
-                rightPadding=topic_padding,
-                topPadding=topic_padding,
-                bottomPadding=topic_padding,
-                )
-            frame.addFromList([topic], page)
-        page.rotate(-90)
-
-    # draw individual graphs
-
-    origin_left = (margins, margins)
-    origin_right = (margins + area_w + 2 * binding, margins)
-    _drawTable(left_table, origin_left)
-    _drawTable(right_table, origin_right)
-    _drawTopics(origin_left)
-    _drawTopics(origin_right)
+    # restore canvas state
 
     page.restoreState()
 
@@ -421,85 +401,7 @@ def _resetID():
     idnum = 0
 
 
-def _registerFonts(fontlist):
-    from os import path, getcwd, sep
-    from inspect import getfile, currentframe
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-
-    try:
-        pdfmetrics.getFont(fontlist[0][0])
-        return
-    except KeyError:
-        pass  # font not registered
-
-    for (fontname, relpath) in fontlist:
-        selfPath = path.dirname(path.abspath(getfile(currentframe())))
-        ttfFile = selfPath + sep + relpath
-        pdfmetrics.registerFont(TTFont(fontname, ttfFile))
-
-
 if __name__ == '__main__':
-    (r, l) = (4, 9)  # rec and lec shading colors
-    shading = [
-        [
-            0,
-            l,
-            r,
-            l,
-            r,
-            0,
-            ],
-        [
-            0,
-            l,
-            r,
-            l,
-            r,
-            0,
-            ],
-        [
-            0,
-            l,
-            r,
-            l,
-            r,
-            0,
-            ],
-        [
-            l,
-            0,
-            l,
-            0,
-            l,
-            0,
-            ],
-        [
-            l,
-            0,
-            l,
-            0,
-            0,
-            0,
-            ],
-        [
-            0,
-            l,
-            0,
-            0,
-            0,
-            0,
-            ],
-        [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            ],
-        ]
-    legend = [(r, 'Recitation'), (l, 'Lecture')]
     itemizedTodo(
         'output.pdf',
         items=[
@@ -511,9 +413,10 @@ if __name__ == '__main__':
             '21W.789',
             'Miscellanea',
             ][::-1],
-        shading=shading,
-        legend=legend,
+        halfpage=0,
+        booklet=0,
+        includeweekend=0,
+        collapseweekend=1,
         gridcolor=60,
         gridline=1,
-        booklet=0,
         )
