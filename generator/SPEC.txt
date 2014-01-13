@@ -34,7 +34,7 @@ boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of grid background
 layout -- number of graphs per page in (x, y) tuple
 
-#### ITEMIZED TODO ####
+#### WEEKLY - ITEMIZED TODO ####
 Generates a biweekly todo list booklet.
 
 Keyword arguments:
@@ -54,7 +54,7 @@ Future features:
 shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
 legend -- list of 2-item tupes indicating grey value and label
 
-#### WEEKLY SCHEDULE ####
+#### WEEKLY - TIME SCHEDULE ####
 Generates a time-based schedule planner.
 
 Keyword arguments:
@@ -75,3 +75,8 @@ Future features:
 startdate -- specific start date for the week; week will begin on day of specified date
 
 
+#### WEEKLY - LINED COLUMNS ####
+
+#### WEEKLY - LINED BLOCKS ####
+
+#### MONTH CALENDAR ####
