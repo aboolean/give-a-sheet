@@ -64,7 +64,7 @@ def itemizedTodo(
     binding=0.25 * inch,
     includeweekend=1,
     collapseweekend=0,
-    gridline=0.7,
+    gridline=1,
     gridcolor=20,
     **excessParams
     ):
@@ -144,9 +144,9 @@ def itemizedTodo(
     # dimensions and layout
 
     key_h = 24
-    key_w = 100
+    key_w = 150
     key_spacer_above = 0  # space between 'Week' and top margin
-    key_spacer_below = 2  # space between 'Week' and grid beneath
+    key_spacer_below = 4  # space between 'Week' and grid beneath
     global key_spacer_indent  # space between 'Week' and topic column
     key_spacer_indent = 0
     global key_spacer_left  # space between 'Week' and left margin
@@ -230,10 +230,15 @@ def itemizedTodo(
     # draw 'Week' boxes
 
     def _makeWeekBox(origin):
+        (x_o, y_o) = origin
 
-        # size (key_h, 4*key_w)
+        page.setStrokeColor(grey(gridcolor))
+        page.setLineWidth(gridline)
+        page.rect(x_o, y_o, key_w, key_h)
 
-        page.circle(origin[0], origin[1], 2)
+        page.setFillColor(grey(100))
+        page.setFont('LearningCurve', 16)
+        page.drawString(x_o + 2, y_o + 0.5 * (key_h - 16 + 4), 'Week:')
 
     key_offset = margins + key_spacer_above + key_h
     if halfpage:
@@ -346,15 +351,26 @@ def _makeGrid(
     table_style.add('ALIGN', (1, 0), (-1, 0), 'CENTER')
 
     table_style.add('FONT', (1, 0), (-1, 0), font_days, 10)  # days
+    table_style.add('TEXTCOLOR', (1, 0), (-1, 0), grey(100))
 
     table_style.add('GRID', (0, 1), (0, -1), gridline, grey(gridcolor))  # topics
     table_style.add('GRID', (1, 0), (-1, 0), gridline, grey(gridcolor))  # days
     table_style.add('LINEBELOW', (1, -1), (-1, -1), gridline, grey(gridcolor))  # bottom
     table_style.add('LINEAFTER', (-1, 1), (-1, -1), gridline, grey(gridcolor))  # right
-    table_style.add('INNERGRID', (1, 1), (-1, -1), gridline / 2,
+    table_style.add('INNERGRID', (1, 1), (-1, -1), 0.5 * gridline,
                     grey(gridcolor))
 
     table.setStyle(table_style)
+
+    # format notes column
+
+    if days[-1] == 'Notes':
+        notes_style = TableStyle()
+        notes_style.add('SPAN', (-1, 1), (-1, -1))
+        notes_style.add('LINEBEFORE', (-1, 1), (-1, -1), gridline,
+                        grey(gridcolor))
+        notes_style.add('BACKGROUND', (-1, 1), (-1, -1), grey(2))
+        table.setStyle(notes_style)
 
     # draw table
 
@@ -409,7 +425,7 @@ if __name__ == '__main__':
             '21W.789',
             'Miscellanea',
             ][::-1],
-        halfpage=1,
+        halfpage=0,
         booklet=0,
         includeweekend=0,
         collapseweekend=1,
