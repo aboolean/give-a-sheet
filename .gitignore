@@ -1,2 +1,4 @@
 generator/*.pdf
+generator/*/*.pdf
+generator/scratch/*
 *.pyc
