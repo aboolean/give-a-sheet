@@ -23,36 +23,36 @@ from Support import registerFonts
 # @ : weekdays
 ## : writable area
 
-######################################|####################################
-#####------------#####################|######################-------------#
-#####------------#####################|######################-------------#
-######################################|####################################
-######################################|####################################
-#####                               ##|#####                              #
-##### @@@@@@@@@ @@@@@@@@@ @@@@@@@@@ ##|##### @@@@@@@@@ @@@@@@@@@ @@@@@@@@ #
-##### @@@@@@@@@ @@@@@@@@@ @@@@@@@@@ ##|##### @@@@@@@@@ @@@@@@@@@ @@@@@@@@ #
-##                                  ##|##                                 #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-##                                  ##|##                                 #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-##                                  ##|##                                 #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-##                                  ##|##                                 #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-##                                  ##|##                                 #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-## ?? ######### ######### ######### ##|## ?? ######### ######### ######## #
-##                                  ##|##                                 #
-######################################|####################################
-######################################|####################################
+#######################################|#####################################
+######------------#####################|######################-------------##
+######------------#####################|######################-------------##
+#######################################|#####################################
+#######################################|#####################################
+######                               ##|#####                              ##
+###### @@@@@@@@@ @@@@@@@@@ @@@@@@@@@ ##|##### @@@@@@@@@ @@@@@@@@@ @@@@@@@@ ##
+###### @@@@@@@@@ @@@@@@@@@ @@@@@@@@@ ##|##### @@@@@@@@@ @@@@@@@@@ @@@@@@@@ ##
+###                                  ##|##                                 ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+###                                  ##|##                                 ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+###                                  ##|##                                 ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+###                                  ##|##                                 ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+###                                  ##|##                                 ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+### ?? ######### ######### ######### ##|## ?? ######### ######### ######## ##
+###                                  ##|##                                 ##
+#######################################|#####################################
+#######################################|#####################################
 
 def itemizedTodo(
     filename,
@@ -144,10 +144,12 @@ def itemizedTodo(
     # dimensions and layout
 
     key_h = 24
-    key_w = 4*key_h
+    key_w = 100
     key_spacer_above = 0  # space between 'Week' and top margin
     key_spacer_below = 2  # space between 'Week' and grid beneath
-    key_spacer_indent = 2  # space between 'Week' and left margin
+    global key_spacer_indent  # space between 'Week' and topic column
+    key_spacer_indent = 0
+    global key_spacer_left  # space between 'Week' and left margin
 
     # grid placement
 
@@ -162,8 +164,11 @@ def itemizedTodo(
         (area_w, area_h) = (page_w - 2 * margins, (page_h - 4 * margins) / 2)
         grid_h = area_h - key_h - key_spacer_above - key_spacer_below
 
-        if booklet:  # half page booklet
-            grid_w = area_w - 2 * binding
+        if booklet:
+
+            # half page booklet
+
+            grid_w = (area_w - 2 * binding) / 2
             origin_bottom_left = (margins, margins)
             origin_bottom_right = (page_w / 2 + binding, margins)
             origin_top_left = (margins, page_h / 2 + margins)
@@ -176,21 +181,26 @@ def itemizedTodo(
             grids.append((origin_top_right, grid_size, day_labels_right))
         else:
 
-              # half page spread
+        # half page spread
 
             origin_bottom = (margins, margins)
             origin_top = (margins, page_h / 2 + margins)
 
-            grids.append((origin_top, (grid_h, area_h), day_labels))
+            grids.append((origin_top, (area_w, grid_h), day_labels))
+            grids.append((origin_bottom, (area_w, grid_h), day_labels))
 
         placeLogo(margins, pagesize, page, quadrant=1)
         placeLogo(margins, pagesize, page, quadrant=4)
     else:
+
         (area_w, area_h) = (page_w - 2 * margins, page_h - 2 * margins)
         grid_h = area_h - key_h - key_spacer_above - key_spacer_below
 
-        if booklet:  # full page booklet
-            grid_w = area_w - 2 * binding
+        if booklet:
+
+            # full page booklet
+
+            grid_w = (area_w - 2 * binding) / 2
             origin_left = (margins, margins)
             origin_right = (page_w / 2 + binding, margins)
 
@@ -198,9 +208,9 @@ def itemizedTodo(
             grids.append((origin_right, (grid_w, grid_h), day_labels_right))
         else:
 
-              # full page spread
+        # full page spread
 
-            grids.append(((margins, margins), (grid_h, area_w), day_labels))
+            grids.append(((margins, margins), (area_w, grid_h), day_labels))
 
         placeLogo(margins, pagesize, page, quadrant=4)
 
@@ -220,19 +230,22 @@ def itemizedTodo(
     # draw 'Week' boxes
 
     def _makeWeekBox(origin):
+
         # size (key_h, 4*key_w)
+
         page.circle(origin[0], origin[1], 2)
 
     key_offset = margins + key_spacer_above + key_h
     if halfpage:
-        _makeWeekBox((margins + key_spacer_indent, page_h - key_offset)) # top
-        _makeWeekBox((margins + key_spacer_indent, page_h/2 - key_offset)) # bottom
+        _makeWeekBox((margins + key_spacer_left, page_h - key_offset))  # top
+        _makeWeekBox((margins + key_spacer_left, page_h / 2 - key_offset))  # bottom
     else:
-        _makeWeekBox((margins + key_spacer_indent, page_h - key_offset))
+        _makeWeekBox((margins + key_spacer_left, page_h - key_offset))
 
     # finalize document
 
     page.save()
+
 
 def _makeGrid(
     page,
@@ -258,9 +271,9 @@ def _makeGrid(
     """
 
     page.saveState()
-    page.translate(*origin)
 
     # fonts
+
     font_topics = 'FreeUniversal-Italic'
     font_days = 'FreeUniversal-Bold'
 
@@ -306,6 +319,9 @@ def _makeGrid(
 
     topic_label_size_padded = topic_label_size + 2 * topic_padding  # add padding
 
+    global key_spacer_left, key_spacer_indent
+    key_spacer_left = topic_label_size_padded + key_spacer_indent
+
     inner_w = area_w - topic_label_size_padded
     cell_w = inner_w / len(days)
 
@@ -336,7 +352,7 @@ def _makeGrid(
     table_style.add('LINEBELOW', (1, -1), (-1, -1), gridline, grey(gridcolor))  # bottom
     table_style.add('LINEAFTER', (-1, 1), (-1, -1), gridline, grey(gridcolor))  # right
     table_style.add('INNERGRID', (1, 1), (-1, -1), gridline / 2,
-                     grey(gridcolor))
+                    grey(gridcolor))
 
     table.setStyle(table_style)
 
@@ -356,6 +372,7 @@ def _makeGrid(
     frame.addFromList([table], page)
 
     # draw topics
+
     page.rotate(90)  # rotated (y, -x)
     for (i, (topic, wrap_length)) in enumerate(topics):
         middle_comp = 0.5 * (topic_label_size - wrap_length)
@@ -380,27 +397,6 @@ def _makeGrid(
     page.restoreState()
 
 
-# ID number generation
-
-idnum = 0
-
-
-def _nextID():
-    global idnum
-    idnum += 1
-    return idnum
-
-
-def _currentID():
-    global idnum
-    return idnum
-
-
-def _resetID():
-    global idnum
-    idnum = 0
-
-
 if __name__ == '__main__':
     itemizedTodo(
         'output.pdf',
@@ -413,7 +409,7 @@ if __name__ == '__main__':
             '21W.789',
             'Miscellanea',
             ][::-1],
-        halfpage=0,
+        halfpage=1,
         booklet=0,
         includeweekend=0,
         collapseweekend=1,
