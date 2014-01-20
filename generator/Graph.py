@@ -9,7 +9,7 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle, Frame
 
 from Logo import placeLogo
-from Coloring import grey
+from Coloring import grey, rainbowGrid
 
 
 def cartesian(
@@ -18,9 +18,10 @@ def cartesian(
     margins=0.5 * inch,
     spacer=0.25 * inch,
     gridspace=0.25 * inch,
-    checkered=0,
     gridline=0.5,
     boxline=1,
+    checkered=0,
+    rainbow=0,
     checkeredcolor=10,
     gridcolor=20,
     boxcolor=80,
@@ -37,9 +38,10 @@ def cartesian(
     margins -- size of margins around page
     spacer -- size of spacing between graphs
     gridspace -- size of individual grid cells
-    checkered -- true for checkered grid
     gridline -- thickness of lines around cells
     boxline -- thickness of border around graph(s), 0 for no box
+    checkered -- true for checkered grid
+    rainbow -- true for rainbow grid coloring
     checkeredcolor -- color of checkered boxes
     gridcolor -- color of grid lines around cells
     boxcolor -- color of box surrounding graph(s)
@@ -76,6 +78,7 @@ def cartesian(
         size=(area_w, area_h),
         gridspace=gridspace,
         checkered=checkered,
+        rainbow=rainbow,
         gridline=gridline,
         boxline=boxline,
         checkeredcolor=checkeredcolor,
@@ -107,6 +110,7 @@ def _makeCartesianGrids(
     size,
     gridspace,
     checkered,
+    rainbow,
     gridline,
     boxline,
     checkeredcolor,
@@ -124,6 +128,7 @@ def _makeCartesianGrids(
     size -- size of the graph as (width, height) tuple
     gridspace -- size of individual grid cells
     checkered -- true for checkered grid
+    rainbow -- true for rainbow grid
     gridline -- thickness of lines around cells
     boxline -- thickness of border around graph(s), 0 for no box
     checkeredcolor -- color of checkered boxes
@@ -156,11 +161,20 @@ def _makeCartesianGrids(
 
     pattern = list()
 
+    if checkered and rainbow:
+        raise ValueError('Grid pattern cannot be both rainbow and checekred.')
+
     if checkered:
-        checkered_cells = [(x, y) for x in xrange(y % 2, cells_x, 2) for y in
-                           xrange(cells_y)]
-        for cell in checkered_cells:
-            pattern.append(('BACKGROUND', cell, cell, grey(checkeredcolor)))
+        for y in xrange(cells_y):
+            for x in xrange(y % 2, cells_x, 2):
+                c = (x, y)
+                pattern.append(('BACKGROUND', c, c, grey(checkeredcolor)))
+    elif rainbow:
+        rainbow_pattern = rainbowGrid((cells_x, cells_y), darkness=10)
+        for x in xrange(cells_x):
+            for y in xrange(cells_y):
+                c = (x, y)
+                pattern.append(('BACKGROUND', c, c, rainbow_pattern[x][y]))
     elif bgndcolor != 0:
         pattern.append(('BACKGROUND', (0, 0), (-1, -1), grey(bgndcolor)))
 
@@ -196,6 +210,7 @@ def dotted(
     gridspace=0.25 * inch,
     dotsize=0.5 * mm,
     boxline=0,
+    rainbow=0,
     dotcolor=50,
     boxcolor=80,
     bgndcolor=0,
@@ -203,7 +218,7 @@ def dotted(
     **excessParams
     ):
     """
-    Generates a page of vertex-dotted grid paper.
+   Generates a page of vertex-dotted grid paper.
 
     Keyword arguments:
     filename -- output PDF document name
@@ -213,6 +228,7 @@ def dotted(
     gridspace -- size of individual grid cells, space between dots
     dotsize -- diameter of each individual dot
     boxline -- thickness of border around graph(s), 0 for no box
+    rainbow -- true for rainbow dot coloring
     dotcolor -- color of dot at each cell vertex
     boxcolor -- color of box surrounding graph(s)
     bgndcolor -- color of grid background
@@ -249,6 +265,7 @@ def dotted(
         gridspace=gridspace,
         dotsize=dotsize,
         boxline=boxline,
+        rainbow=rainbow,
         dotcolor=dotcolor,
         boxcolor=boxcolor,
         bgndcolor=bgndcolor,
@@ -278,6 +295,7 @@ def _makeDottedGrids(
     gridspace,
     dotsize,
     boxline,
+    rainbow,
     dotcolor,
     boxcolor,
     bgndcolor,
@@ -293,6 +311,7 @@ def _makeDottedGrids(
     gridspace -- size of individual grid cells, space between dots
     dotsize -- diameter of each individual dot
     boxline -- thickness of border around graph(s), 0 for no box
+    rainbow -- true for rainbow dot coloring
     dotcolor -- color of dot at each cell vertex
     boxcolor -- color of box surrounding graph(s)
     bgndcolor -- color of grid background
@@ -344,13 +363,23 @@ def _makeDottedGrids(
 
         # draw dots
 
+        rainbow_pattern = rainbowGrid((dots_x, dots_y), darkness=50)
         for vert_x in xrange(dots_x):
             y = loc_y + yMargins
             if not outerDots:
                 y += gridspace
             for vert_y in xrange(dots_y):
-                page.setFillColor(grey(dotcolor))
-                page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=0, fill=1)
+                if rainbow:
+                    page.setFillColor(rainbow_pattern[vert_x][vert_y])
+                    page.setLineWidth(dotsize / 10)
+                    page.setStrokeColor(grey(30))
+                    page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=1,
+                                fill=1)
+                else:
+                    page.setFillColor(grey(dotcolor))
+                    page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=0,
+                                fill=1)
+
                 y += gridspace
             x += gridspace
 
@@ -360,12 +389,14 @@ if __name__ == '__main__':
         'output.pdf',
         spacer=0.1 * inch,
         boxline=2,
-        gridspace=0.1 * inch,
+        gridspace=0.25 * inch,
         bgndcolor=5,
         gridcolor=0,
         gridline=1,
         boxcolor=50,
         layout=(3, 7),
+        checkered=0,
+        rainbow=1,
         )
 
-    # dotted("output.pdf",layout=(3,4),boxline=0,bgndcolor=5,gridspace=0.25*inch)
+    # dotted("output.pdf",layout=(3,4),boxline=0,bgndcolor=3,gridspace=0.25*inch,rainbow=1)
