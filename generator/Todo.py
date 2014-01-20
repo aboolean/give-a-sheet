@@ -238,7 +238,8 @@ def itemizedTodo(
 
         page.setFillColor(grey(100))
         page.setFont('LearningCurve', 16)
-        page.drawString(x_o + 2, y_o + 0.5 * (key_h - 16 + 4), 'Week:')
+        week_padding = 0.5 * (key_h - 16)
+        page.drawString(x_o + week_padding, y_o + week_padding + 2, 'Week:')
 
     key_offset = margins + key_spacer_above + key_h
     if halfpage:
