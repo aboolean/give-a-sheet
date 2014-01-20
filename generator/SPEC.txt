@@ -16,7 +16,7 @@ gridcolor -- color of grid lines around cells
 boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of background of each cell
 layout -- number of graphs per page in (x, y) tuple
-    
+
 #### DOTTED GRID ####
 Generates a page of vertex-dotted grid paper.
 
@@ -53,6 +53,7 @@ gridcolor -- color of grid lines around cells
 Future features:
 shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
 legend -- list of 2-item tupes indicating grey value and label
+startdate -- specific start date for the week; week will begin on day of specified date
 
 #### WEEKLY - TIME SCHEDULE ####
 Generates a time-based schedule planner.
