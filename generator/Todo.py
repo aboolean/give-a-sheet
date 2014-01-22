@@ -11,9 +11,9 @@ from reportlab.lib.enums import TA_CENTER
 from reportlab.platypus import Table, TableStyle, Frame, Paragraph
 from reportlab.pdfbase.pdfform import textFieldAbsolute
 
-from Logo import placeLogo
-from Coloring import grey
-from Support import registerFonts
+from logo import placeLogo
+from coloring import grey
+from support import registerFonts
 
 
 # ASCII Model

@@ -8,8 +8,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle, Frame
 
-from Logo import placeLogo
-from Coloring import grey, rainbowGrid
+from logo import placeLogo
+from coloring import grey, rainbowGrid
 
 
 def cartesian(
@@ -170,7 +170,7 @@ def _makeCartesianGrids(
                 c = (x, y)
                 pattern.append(('BACKGROUND', c, c, grey(checkeredcolor)))
     elif rainbow:
-        rainbow_pattern = rainbowGrid((cells_x, cells_y), darkness=10)
+        rainbow_pattern = rainbowGrid((cells_x, cells_y), darkness=5)
         for x in xrange(cells_x):
             for y in xrange(cells_y):
                 c = (x, y)
