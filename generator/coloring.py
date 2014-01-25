@@ -23,6 +23,7 @@ def rainbowGrid(dimensions, darkness=1, scheme=None):
     """
     Returns a 2D list (x,y order) of Color instances forming a rainbow grid.
 
+    Keyword arguments:
     dimensions -- cells in the grid as an (x,y) tuple
     darkness -- darkness of each color, expressed in range [0,100]
     scheme -- a list of Color instances
@@ -32,8 +33,16 @@ def rainbowGrid(dimensions, darkness=1, scheme=None):
     # scheme = [colors.maroon, colors.orangered, colors.gold, colors.olivedrab, colors.ReportLabBlue, colors.indigo, colors.purple]
     # scheme = [colors.red, colors.orange, colors.yellow, colors.green, colors.blue, colors.indigo]
     # scheme = [colors.toColor('rgb(204,0,0)'), colors.toColor('rgb(255,101,59)'), colors.toColor('rgb(245,182,87)'), colors.toColor('rgb(61,122,91)'), colors.toColor('rgb(37,61,129)'), colors.toColor('rgb(83,49,84)')]
+
     if scheme == None or len(scheme) < 5:
-        scheme = [colors.firebrick, colors.orangered, colors.gold, colors.olivedrab, colors.ReportLabBlue, colors.purple]
+        scheme = [
+            colors.firebrick,
+            colors.orangered,
+            colors.gold,
+            colors.olivedrab,
+            colors.ReportLabBlue,
+            colors.purple,
+            ]
     scheme = map(colors.Whiter, scheme, [0.01 * darkness] * len(scheme))
     (w, h) = dimensions
     grid = list()
