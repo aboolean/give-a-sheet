@@ -73,7 +73,7 @@ def cartesian(
 
     page = canvas.Canvas(filename, pagesize=pagesize)
     for loc in frame_locs:
-        gridSection(
+        squareSection(
             page=page,
             location=loc,
             size=(area_w, area_h),
@@ -105,7 +105,7 @@ def cartesian(
     page.save()
 
 
-def gridSection(
+def squareSection(
     page,
     location,
     size,
