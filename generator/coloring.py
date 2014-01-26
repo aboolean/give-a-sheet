@@ -19,7 +19,7 @@ def grey(percentblack):
     return colors.CMYKColor(black=0.01 * percentblack)
 
 
-def rainbowGrid(dimensions, darkness=1, scheme=None):
+def rainbowGrid(dimensions, darkness=100, scheme=None):
     """
     Returns a 2D list (x,y order) of Color instances forming a rainbow grid.
 
@@ -70,6 +70,43 @@ def rainbowGrid(dimensions, darkness=1, scheme=None):
         grid.append(col)
 
     return grid
+
+
+def rainbowRow(length, darkness=100, scheme=None):
+    """
+    Returns a list of Color instances forming a linear rainbow.
+
+    Keyword arguments:
+    length -- number of elements
+    darkness -- darkness of each color, expressed in range [0,100]
+    scheme -- a list of Color instances
+    """
+
+    if scheme == None or len(scheme) < 2:
+        scheme = [
+            colors.firebrick,
+            colors.orangered,
+            colors.darkgoldenrod,
+            colors.olivedrab,
+            colors.ReportLabBlue,
+            colors.purple,
+            ]
+    scheme = map(colors.Whiter, scheme, [0.01 * darkness] * len(scheme))
+
+    line = list()
+
+    chooselist = scheme[:]
+    for i in xrange(length):
+        if len(chooselist) == 1:
+            line.append(chooselist[0])
+            chooselist = scheme[:]
+            chooselist.remove(line[-1])
+        else:
+            color = random.choice(chooselist)
+            line.append(color)
+            chooselist.remove(color)
+
+    return line
 
 
 if __name__ == '__main__':
