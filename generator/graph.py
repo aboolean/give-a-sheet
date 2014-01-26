@@ -72,20 +72,21 @@ def cartesian(
     # draw result
 
     page = canvas.Canvas(filename, pagesize=pagesize)
-    _makeCartesianGrids(
-        page=page,
-        locations=frame_locs,
-        size=(area_w, area_h),
-        gridspace=gridspace,
-        checkered=checkered,
-        rainbow=rainbow,
-        gridline=gridline,
-        boxline=boxline,
-        checkeredcolor=checkeredcolor,
-        gridcolor=gridcolor,
-        boxcolor=boxcolor,
-        bgndcolor=bgndcolor,
-        )
+    for loc in frame_locs:
+        gridSection(
+            page=page,
+            location=loc,
+            size=(area_w, area_h),
+            gridspace=gridspace,
+            checkered=checkered,
+            rainbow=rainbow,
+            gridline=gridline,
+            boxline=boxline,
+            checkeredcolor=checkeredcolor,
+            gridcolor=gridcolor,
+            boxcolor=boxcolor,
+            bgndcolor=bgndcolor,
+            )
 
     placeLogo(margins, pagesize, canvas, quadrant=4)
 
@@ -104,9 +105,9 @@ def cartesian(
     page.save()
 
 
-def _makeCartesianGrids(
+def gridSection(
     page,
-    locations,
+    location,
     size,
     gridspace,
     checkered,
@@ -124,7 +125,7 @@ def _makeCartesianGrids(
 
     Keyword arguments:
     page -- a Canvas instance on which to draw
-    locations -- locations of the graph as a list of (x, y) tuple
+    location -- location of the graph as a list of (x, y) tuple
     size -- size of the graph as (width, height) tuple
     gridspace -- size of individual grid cells
     checkered -- true for checkered grid
@@ -140,6 +141,7 @@ def _makeCartesianGrids(
     # dimensions and spacing
 
     (area_w, area_h) = size
+    loc_x, loc_y = location
 
     (cells_x, cells_y) = (int(area_w / gridspace), int(area_h / gridspace))
 
@@ -186,20 +188,19 @@ def _makeCartesianGrids(
         style.add('BOX', (0, 0), (-1, -1), boxline, grey(boxcolor))
     table.setStyle(style)
 
-    # draw individual graphs
+    # draw graphs
 
-    for (loc_x, loc_y) in locations:
-        frame = Frame(
-            loc_x + xMargins,
-            loc_y + yMargins,
-            grid_w,
-            grid_h,
-            leftPadding=0,
-            bottomPadding=0,
-            rightPadding=0,
-            topPadding=0,
-            )
-        frame.addFromList([table], page)
+    frame = Frame(
+        loc_x + xMargins,
+        loc_y + yMargins,
+        grid_w,
+        grid_h,
+        leftPadding=0,
+        bottomPadding=0,
+        rightPadding=0,
+        topPadding=0,
+        )
+    frame.addFromList([table], page)
 
 
 def dotted(
@@ -258,18 +259,19 @@ def dotted(
     # draw result
 
     page = canvas.Canvas(filename, pagesize=pagesize)
-    _makeDottedGrids(
-        page=page,
-        locations=frame_locs,
-        size=(area_w, area_h),
-        gridspace=gridspace,
-        dotsize=dotsize,
-        boxline=boxline,
-        rainbow=rainbow,
-        dotcolor=dotcolor,
-        boxcolor=boxcolor,
-        bgndcolor=bgndcolor,
-        )
+    for loc in frame_locs:
+        dotSection(
+            page=page,
+            location=loc,
+            size=(area_w, area_h),
+            gridspace=gridspace,
+            dotsize=dotsize,
+            boxline=boxline,
+            rainbow=rainbow,
+            dotcolor=dotcolor,
+            boxcolor=boxcolor,
+            bgndcolor=bgndcolor,
+            )
     placeLogo(margins, pagesize, canvas, quadrant=4)
 
     page.setTitle('Dotted Graph Paper by Give Sheet')
@@ -288,9 +290,9 @@ def dotted(
     page.save()
 
 
-def _makeDottedGrids(
+def dotSection(
     page,
-    locations,
+    location,
     size,
     gridspace,
     dotsize,
@@ -306,7 +308,7 @@ def _makeDottedGrids(
 
     Keyword arguments:
     page -- a Canvas instance on which to draw
-    locations -- locations of the graph(s) as a list of (x, y) tuple
+    location -- location of the graph as a list of (x, y) tuple
     size -- size of the graph(s) as (width, height) tuple
     gridspace -- size of individual grid cells, space between dots
     dotsize -- diameter of each individual dot
@@ -320,6 +322,7 @@ def _makeDottedGrids(
     # dimensions and spacing
 
     (area_w, area_h) = size
+    (loc_x, loc_y) = location
 
     (cells_x, cells_y) = (int(area_w / gridspace), int(area_h / gridspace))
     if cells_x < 1 or cells_y < 1:
@@ -333,55 +336,51 @@ def _makeDottedGrids(
 
     outerDots = bgndcolor == 0 and boxline == 0
 
-    # draw individual graphs
+    # draw surrounding box
 
-    for (loc_x, loc_y) in locations:
+    page.setStrokeColor(grey(boxcolor))
+    page.setFillColor(grey(bgndcolor))
+    page.setLineWidth(boxline)
+    page.roundRect(
+        x=loc_x + xMargins,
+        y=loc_y + yMargins,
+        width=grid_w,
+        height=grid_h,
+        radius=gridspace / 2,
+        stroke=boxline > 0,
+        fill=bgndcolor != 0,
+        )
 
-        # draw surrounding box
+    # starting position and number of dots
 
-        page.setStrokeColor(grey(boxcolor))
-        page.setFillColor(grey(bgndcolor))
-        page.setLineWidth(boxline)
-        page.roundRect(
-            x=loc_x + xMargins,
-            y=loc_y + yMargins,
-            width=grid_w,
-            height=grid_h,
-            radius=gridspace / 2,
-            stroke=boxline > 0,
-            fill=bgndcolor != 0,
-            )
+    x = loc_x + xMargins
+    if not outerDots:
+        x += gridspace
+        (dots_x, dots_y) = (cells_x - 1, cells_y - 1)
+    else:
+        (dots_x, dots_y) = (cells_x + 1, cells_y + 1)
 
-        # starting position and number of dots
+    # draw dots
 
-        x = loc_x + xMargins
+    rainbow_pattern = rainbowGrid((dots_x, dots_y), darkness=50)
+    for vert_x in xrange(dots_x):
+        y = loc_y + yMargins
         if not outerDots:
-            x += gridspace
-            (dots_x, dots_y) = (cells_x - 1, cells_y - 1)
-        else:
-            (dots_x, dots_y) = (cells_x + 1, cells_y + 1)
+            y += gridspace
+        for vert_y in xrange(dots_y):
+            if rainbow:
+                page.setFillColor(rainbow_pattern[vert_x][vert_y])
+                page.setLineWidth(dotsize / 10)
+                page.setStrokeColor(grey(30))
+                page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=1,
+                            fill=1)
+            else:
+                page.setFillColor(grey(dotcolor))
+                page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=0,
+                            fill=1)
 
-        # draw dots
-
-        rainbow_pattern = rainbowGrid((dots_x, dots_y), darkness=50)
-        for vert_x in xrange(dots_x):
-            y = loc_y + yMargins
-            if not outerDots:
-                y += gridspace
-            for vert_y in xrange(dots_y):
-                if rainbow:
-                    page.setFillColor(rainbow_pattern[vert_x][vert_y])
-                    page.setLineWidth(dotsize / 10)
-                    page.setStrokeColor(grey(30))
-                    page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=1,
-                                fill=1)
-                else:
-                    page.setFillColor(grey(dotcolor))
-                    page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=0,
-                                fill=1)
-
-                y += gridspace
-            x += gridspace
+            y += gridspace
+        x += gridspace
 
 
 if __name__ == '__main__':
