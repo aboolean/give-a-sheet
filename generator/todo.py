@@ -69,7 +69,7 @@ def itemizedTodo(
     **excessParams
     ):
     """
-    Generates a biweekly todo list booklet.
+    Generates a weekly todo list. Each columns represents a day, and the rows are itemized by topics.
 
     Keyword arguments:
     filename -- output PDF document name
