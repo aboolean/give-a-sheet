@@ -1,4 +1,22 @@
-#### CARTESIAN GRID ####
+#### LINED #### lined.lined
+Generates a page of lined paper.
+
+filename -- output PDF document name
+pagesize -- size of page as (width, height) tuple
+margins -- size of margins around page
+spacer -- size of spacing between graphs
+linespace -- spacing between the lines
+linewidth -- width of each line
+boxline -- thickness of border around graph(s), 0 for no box
+rainbow -- true for rainbow grid coloring
+linecolor -- color of each line
+boxcolor -- color of box surrounding graph(s)
+bgndcolor -- color of background of each cell
+layout -- number of graphs per page in (x, y) tuple
+borderless -- overrides layout and produces end-to-end ruled page
+marginline -- flag for including the left margin line on borderless page
+
+#### CARTESIAN GRID #### graph.cartesian
 Generates a page of Cartesian graph paper.
 
 Keyword arguments:
@@ -17,7 +35,7 @@ boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of background of each cell
 layout -- number of graphs per page in (x, y) tuple
 
-#### DOTTED GRID ####
+#### DOTTED GRID #### graph.dotted
 Generates a page of vertex-dotted grid paper.
 
 Keyword arguments:
@@ -34,8 +52,8 @@ boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of grid background
 layout -- number of graphs per page in (x, y) tuple
 
-#### WEEKLY - ITEMIZED TODO ####
-Generates a biweekly todo list booklet.
+#### WEEKLY - ITEMIZED TODO #### todo.itemizedTodo
+Generates a weekly todo list. Each columns represents a day, and the rows are itemized by topics.
 
 Keyword arguments:
 filename -- output PDF document name
@@ -54,6 +72,10 @@ Future features:
 shading -- a 2D list of topics (rows) vs. days (cols); values indcate percent grey
 legend -- list of 2-item tupes indicating grey value and label
 startdate -- specific start date for the week; week will begin on day of specified date
+
+#### WEEKLY - LINED/BLANK COLUMNS ####
+
+#### WEEKLY - LINED/BLANK BLOCKS ####
 
 #### WEEKLY - TIME SCHEDULE ####
 Generates a time-based schedule planner.
@@ -75,9 +97,6 @@ gridcolor -- color of grid lines around cells
 Future features:
 startdate -- specific start date for the week; week will begin on day of specified date
 
-
-#### WEEKLY - LINED COLUMNS ####
-
-#### WEEKLY - LINED BLOCKS ####
-
 #### MONTH CALENDAR ####
+
+#### CASCADING YEAR CALENDAR ####
