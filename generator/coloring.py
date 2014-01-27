@@ -29,16 +29,11 @@ def rainbowGrid(dimensions, darkness=100, scheme=None):
     scheme -- a list of Color instances
     """
 
-    # scheme = [colors.HexColor(0xba2742), colors.HexColor(0xd99b50), colors.HexColor(0xf5f573), colors.HexColor(0x688057), colors.HexColor(0x561f91), colors.HexColor(0x94296f)]
-    # scheme = [colors.maroon, colors.orangered, colors.gold, colors.olivedrab, colors.ReportLabBlue, colors.indigo, colors.purple]
-    # scheme = [colors.red, colors.orange, colors.yellow, colors.green, colors.blue, colors.indigo]
-    # scheme = [colors.toColor('rgb(204,0,0)'), colors.toColor('rgb(255,101,59)'), colors.toColor('rgb(245,182,87)'), colors.toColor('rgb(61,122,91)'), colors.toColor('rgb(37,61,129)'), colors.toColor('rgb(83,49,84)')]
-
     if scheme == None or len(scheme) < 5:
         scheme = [
             colors.firebrick,
             colors.orangered,
-            colors.gold,
+            colors.darkgoldenrod,
             colors.olivedrab,
             colors.ReportLabBlue,
             colors.purple,
