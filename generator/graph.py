@@ -431,7 +431,7 @@ def dotSection(
                 page.setFillColor(rainbow_pattern[vert_x][vert_y])
                 page.setLineWidth(dotsize / 10)
                 page.setStrokeColor(grey(30))
-                page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=1, fill=1)
+                page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=0, fill=1)
             else:
                 page.setFillColor(grey(dotcolor))
                 page.circle(x_cen=x, y_cen=y, r=dotsize / 2, stroke=0, fill=1)
