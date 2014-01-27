@@ -346,7 +346,7 @@ def dotSection(
         y=loc_y + yMargins,
         width=grid_w,
         height=grid_h,
-        radius=gridspace / 2,
+        radius=gridspace / 3,
         stroke=boxline > 0,
         fill=bgndcolor != 0,
         )
