@@ -13,8 +13,10 @@ linecolor -- color of each line
 boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of background of each cell
 layout -- number of graphs per page in (x, y) tuple
-borderless -- overrides layout and produces end-to-end ruled page
-marginline -- flag for including the left margin line on borderless page
+borderless -- overrides layout and produces end-to-end page
+guideline -- flag for including the left margin line on borderless page
+guidespace -- space of left margin line from page edge
+guidewidth -- width of left margin line
 
 #### CARTESIAN GRID #### graph.cartesian
 Generates a page of Cartesian graph paper.
@@ -34,6 +36,10 @@ gridcolor -- color of grid lines around cells
 boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of background of each cell
 layout -- number of graphs per page in (x, y) tuple
+borderless -- overrides layout and produces end-to-end page
+guideline -- flag for including the left margin line on borderless page
+guidespace -- space of left margin line from page edge
+guidewidth -- width of left margin line
 
 #### DOTTED GRID #### graph.dotted
 Generates a page of vertex-dotted grid paper.
@@ -51,6 +57,10 @@ dotcolor -- color of dot at each cell vertex
 boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of grid background
 layout -- number of graphs per page in (x, y) tuple
+borderless -- overrides layout and produces end-to-end page
+guideline -- flag for including the left margin line on borderless page
+guidespace -- space of left margin line from page edge
+guidewidth -- width of left margin line
 
 #### WEEKLY - ITEMIZED TODO #### todo.itemizedTodo
 Generates a weekly todo list. Each columns represents a day, and the rows are itemized by topics.
