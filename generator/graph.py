@@ -27,6 +27,10 @@ def cartesian(
     boxcolor=80,
     bgndcolor=0,
     layout=(1, 1),
+    borderless=0,
+    guideline=1,
+    guidespace=1.25 * inch,
+    guidewidth=1,
     **excessParams
     ):
     """
@@ -47,46 +51,72 @@ def cartesian(
     boxcolor -- color of box surrounding graph(s)
     bgndcolor -- color of background of each cell
     layout -- number of graphs per page in (x, y) tuple
+    borderless -- overrides layout and produces end-to-end page
+    guideline -- flag for including the left margin line on borderless page
+    guidespace -- space of left margin line from page edge
+    guidewidth -- width of left margin line
     """
 
-    # dimensions and layout
-
-    (up_w, up_h) = (layout if layout > (0, 0) else (1, 1))
-    (page_w, page_h) = pagesize
-    area_w = (page_w - 2 * margins - (up_w - 1) * spacer) / up_w
-    area_h = (page_h - 2 * margins - (up_h - 1) * spacer) / up_h
-
-    if area_w < 0 or area_h < 0:
-        raise ValueError('Specified dimensions do not fit on page.')
-
-    frame_locs = list()
-
-    x = margins  # begin after left margin
-    for frame_x in xrange(up_w):
-        y = margins  # begin above lower margin
-        for frame_y in xrange(up_h):
-            frame_locs.append((x, y))
-            y += area_h + spacer
-        x += area_w + spacer
-
-    # draw result
-
     page = canvas.Canvas(filename, pagesize=pagesize)
-    for loc in frame_locs:
+
+    if borderless:
         squareSection(
-            page=page,
-            location=loc,
-            size=(area_w, area_h),
-            gridspace=gridspace,
-            checkered=checkered,
-            rainbow=rainbow,
-            gridline=gridline,
-            boxline=boxline,
-            checkeredcolor=checkeredcolor,
-            gridcolor=gridcolor,
-            boxcolor=boxcolor,
-            bgndcolor=bgndcolor,
-            )
+                page=page,
+                location=(0,0),
+                size=pagesize,
+                gridspace=gridspace,
+                checkered=checkered,
+                rainbow=rainbow,
+                gridline=gridline,
+                boxline=0,
+                checkeredcolor=checkeredcolor,
+                gridcolor=gridcolor,
+                boxcolor=boxcolor,
+                bgndcolor=bgndcolor,
+                )
+        if guideline:
+            page.setStrokeColor(grey(boxcolor))
+            page.setLineWidth(guidewidth)
+            page.line(guidespace, 0, guidespace, pagesize[1])
+
+    else:
+        # dimensions and layout
+
+        (up_w, up_h) = (layout if layout > (0, 0) else (1, 1))
+        (page_w, page_h) = pagesize
+        area_w = (page_w - 2 * margins - (up_w - 1) * spacer) / up_w
+        area_h = (page_h - 2 * margins - (up_h - 1) * spacer) / up_h
+
+        if area_w < 0 or area_h < 0:
+            raise ValueError('Specified dimensions do not fit on page.')
+
+        frame_locs = list()
+
+        x = margins  # begin after left margin
+        for frame_x in xrange(up_w):
+            y = margins  # begin above lower margin
+            for frame_y in xrange(up_h):
+                frame_locs.append((x, y))
+                y += area_h + spacer
+            x += area_w + spacer
+
+        # draw result
+
+        for loc in frame_locs:
+            squareSection(
+                page=page,
+                location=loc,
+                size=(area_w, area_h),
+                gridspace=gridspace,
+                checkered=checkered,
+                rainbow=rainbow,
+                gridline=gridline,
+                boxline=boxline,
+                checkeredcolor=checkeredcolor,
+                gridcolor=gridcolor,
+                boxcolor=boxcolor,
+                bgndcolor=bgndcolor,
+                )
 
     placeLogo(margins, pagesize, canvas, quadrant=4)
 
@@ -212,10 +242,14 @@ def dotted(
     dotsize=0.5 * mm,
     boxline=0,
     rainbow=0,
-    dotcolor=50,
+    dotcolor=40,
     boxcolor=80,
     bgndcolor=0,
     layout=(1, 1),
+    borderless=0,
+    guideline=1,
+    guidespace=1.25 * inch,
+    guidewidth=1,
     **excessParams
     ):
     """
@@ -234,44 +268,69 @@ def dotted(
     boxcolor -- color of box surrounding graph(s)
     bgndcolor -- color of grid background
     layout -- number of graphs per page in (x, y) tuple
+    borderless -- overrides layout and produces end-to-end page
+    guideline -- flag for including the left margin line on borderless page
+    guidespace -- space of left margin line from page edge
+    guidewidth -- width of left margin line
     """
 
-    # dimensions and layout
-
-    (up_w, up_h) = (layout if layout > (0, 0) else (1, 1))
-    (page_w, page_h) = pagesize
-    (area_w, area_h) = ((page_w - 2 * margins - (up_w - 1) * spacer) / up_w,
-                        (page_h - 2 * margins - (up_h - 1) * spacer) / up_h)
-
-    if area_w < 0 or area_h < 0:
-        raise ValueError('Specified dimensions do not fit on page.')
-
-    frame_locs = list()
-
-    x = margins  # begin after left margin
-    for frame_x in xrange(up_w):
-        y = margins  # begin above lower margin
-        for frame_y in xrange(up_h):
-            frame_locs.append((x, y))
-            y += area_h + spacer
-        x += area_w + spacer
-
-    # draw result
-
     page = canvas.Canvas(filename, pagesize=pagesize)
-    for loc in frame_locs:
+
+    if borderless:
         dotSection(
-            page=page,
-            location=loc,
-            size=(area_w, area_h),
-            gridspace=gridspace,
-            dotsize=dotsize,
-            boxline=boxline,
-            rainbow=rainbow,
-            dotcolor=dotcolor,
-            boxcolor=boxcolor,
-            bgndcolor=bgndcolor,
-            )
+                page=page,
+                location=(0,0),
+                size=pagesize,
+                gridspace=gridspace,
+                dotsize=dotsize,
+                boxline=0,
+                rainbow=rainbow,
+                dotcolor=dotcolor,
+                boxcolor=boxcolor,
+                bgndcolor=bgndcolor,
+                )
+        if guideline:
+            page.setStrokeColor(grey(boxcolor))
+            page.setLineWidth(guidewidth)
+            page.line(guidespace, 0, guidespace, pagesize[1])
+
+    else:
+        # dimensions and layout
+
+        (up_w, up_h) = (layout if layout > (0, 0) else (1, 1))
+        (page_w, page_h) = pagesize
+        (area_w, area_h) = ((page_w - 2 * margins - (up_w - 1) * spacer) / up_w,
+                            (page_h - 2 * margins - (up_h - 1) * spacer) / up_h)
+
+        if area_w < 0 or area_h < 0:
+            raise ValueError('Specified dimensions do not fit on page.')
+
+        frame_locs = list()
+
+        x = margins  # begin after left margin
+        for frame_x in xrange(up_w):
+            y = margins  # begin above lower margin
+            for frame_y in xrange(up_h):
+                frame_locs.append((x, y))
+                y += area_h + spacer
+            x += area_w + spacer
+
+        # draw result
+
+        for loc in frame_locs:
+            dotSection(
+                page=page,
+                location=loc,
+                size=(area_w, area_h),
+                gridspace=gridspace,
+                dotsize=dotsize,
+                boxline=boxline,
+                rainbow=rainbow,
+                dotcolor=dotcolor,
+                boxcolor=boxcolor,
+                bgndcolor=bgndcolor,
+                )
+
     placeLogo(margins, pagesize, canvas, quadrant=4)
 
     page.setTitle('Dotted Graph Paper by Give Sheet')
@@ -382,18 +441,36 @@ def dotSection(
 
 
 if __name__ == '__main__':
-    cartesian(
-        'output.pdf',
-        spacer=0.1 * inch,
-        boxline=2,
-        gridspace=0.25 * inch,
-        bgndcolor=5,
-        gridcolor=0,
-        gridline=1,
-        boxcolor=50,
-        layout=(3, 7),
-        checkered=0,
-        rainbow=1,
-        )
+    # cartesian(
+    #     'output.pdf',
+    #     spacer=0.1 * inch,
+    #     boxline=2,
+    #     gridspace=0.25 * inch,
+    #     bgndcolor=3,
+    #     gridcolor=0,
+    #     gridline=1,
+    #     boxcolor=50,
+    #     layout=(3, 7),
+    #     checkered=0,
+    #     rainbow=0,
+    #     borderless=1,
+    #     marginline=1,
+    #     )
 
-    # dotted("output.pdf",layout=(3,4),boxline=0,bgndcolor=3,gridspace=0.25*inch,rainbow=1)
+    dotted(
+        "output.pdf",
+        pagesize=letter,
+        margins=0.5 * inch,
+        spacer=0.25 * inch,
+        gridspace=0.25 * inch,
+        dotsize=0.5 * mm,
+        boxline=1,
+        rainbow=0,
+        dotcolor=40,
+        boxcolor=80,
+        bgndcolor=0,
+        layout=(2,2),
+        borderless=1,
+        guideline=1,
+        guidespace=1.25 * inch,
+        guidewidth=1)

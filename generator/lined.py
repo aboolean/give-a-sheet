@@ -25,7 +25,9 @@ def lined(
     bgndcolor=0,
     layout=(1, 1),
     borderless=0,
-    marginline=1,
+    guideline=1,
+    guidespace=1.25 * inch,
+    guidewidth=1,
     **excessParams
     ):
     """
@@ -43,8 +45,10 @@ def lined(
     boxcolor -- color of box surrounding graph(s)
     bgndcolor -- color of background of each cell
     layout -- number of graphs per page in (x, y) tuple
-    borderless -- overrides layout and produces end-to-end ruled page
-    marginline -- flag for including the left margin line on borderless page
+    borderless -- overrides layout and produces end-to-end page
+    guideline -- flag for including the left margin line on borderless page
+    guidespace -- space of left margin line from page edge
+    guidewidth -- width of left margin line
     """
 
     page = canvas.Canvas(filename, pagesize=pagesize)
@@ -62,10 +66,10 @@ def lined(
             linecolor=linecolor,
             linewidth=linewidth,
             )
-        if marginline:
+        if guideline:
             page.setStrokeColor(grey(linecolor))
-            page.setLineWidth(linewidth * 2)
-            page.line(1.25 * inch, 0, 1.25 * inch, pagesize[1])
+            page.setLineWidth(guidewidth)
+            page.line(guidespace, 0, guidespace, pagesize[1])
     else:
 
         # dimensions and layout
@@ -249,6 +253,6 @@ if __name__ == '__main__':
         boxcolor=80,
         bgndcolor=0,
         layout=(1, 2),
-        borderless=0,
-        marginline=1,
+        borderless=1,
+        guideline=1,
         )
