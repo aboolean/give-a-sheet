@@ -1,3 +1,29 @@
+#### DUAL ####
+Generates a page that is squared between lines.
+
+Keyword arguments:
+filename -- output PDF document name
+pagesize -- size of page as (width, height) tuple
+margins -- size of margins around page
+spacer -- size of spacing between graphs
+gridspace -- size of individual grid cells
+linefreq -- frequency of lines expressed as the number of rows per line
+gridline -- thickness of lines around cells
+linewidth -- width of each writing line
+boxline -- thickness of border around graph(s), 0 for no box
+checkered -- true for checkered grid
+rainbow -- true for rainbow grid coloring
+checkeredcolor -- color of checkered boxes
+gridcolor -- color of grid lines around cells
+linecolor -- color of each line
+boxcolor -- color of box surrounding graph(s)
+bgndcolor -- color of background of each cell
+layout -- number of graphs per page in (x, y) tuple
+borderless -- overrides layout and produces end-to-end page
+guideline -- flag for including the left margin line on borderless page
+guidespace -- space of left margin line from page edge
+guidewidth -- width of left margin line
+
 #### LINED #### lined.lined
 Generates a page of lined paper.
 
@@ -8,7 +34,7 @@ spacer -- size of spacing between graphs
 linespace -- spacing between the lines
 linewidth -- width of each line
 boxline -- thickness of border around graph(s), 0 for no box
-rainbow -- true for rainbow grid coloring
+rainbow -- true for rainbow line coloring
 linecolor -- color of each line
 boxcolor -- color of box surrounding graph(s)
 bgndcolor -- color of background of each cell
@@ -108,5 +134,7 @@ Future features:
 startdate -- specific start date for the week; week will begin on day of specified date
 
 #### MONTH CALENDAR ####
+
+#### YEAR OVERVIEW ####
 
 #### CASCADING YEAR CALENDAR ####
