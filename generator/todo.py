@@ -3,7 +3,7 @@
 
 import math
 from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
+from reportlab.lib.units import inch, mm
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
@@ -14,6 +14,7 @@ from reportlab.pdfbase.pdfform import textFieldAbsolute
 from logo import placeLogo
 from coloring import grey
 from support import registerFonts
+from lined import ruleSection
 
 
 # ASCII Model
@@ -365,17 +366,28 @@ def _makeGrid(
 
     # format notes column
 
+    (x_o, y_o) = origin
+
     if days[-1] == 'Notes':
         notes_style = TableStyle()
         notes_style.add('SPAN', (-1, 1), (-1, -1))
         notes_style.add('LINEBEFORE', (-1, 1), (-1, -1), gridline,
                         grey(gridcolor))
-        notes_style.add('BACKGROUND', (-1, 1), (-1, -1), grey(2))
         table.setStyle(notes_style)
+        ruleSection(
+            page,
+            loc=(x_o + area_w - cell_w, y_o),
+            size=(cell_w, cell_h * len(items)),
+            padding=2*mm,
+            spacing=0.25 * inch,
+            above=None,
+            below=None,
+            linecolor=40,
+            linewidth=0.5 * gridline,
+            boundingbox=0)
 
     # draw table
 
-    (x_o, y_o) = origin
     frame = Frame(
         x_o,
         y_o,
