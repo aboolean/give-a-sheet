@@ -40,7 +40,7 @@ def lined(
     linespace -- spacing between the lines
     linewidth -- width of each line
     boxline -- thickness of border around graph(s), 0 for no box
-    rainbow -- true for rainbow grid coloring
+    rainbow -- true for rainbow line coloring
     linecolor -- color of each line
     boxcolor -- color of box surrounding graph(s)
     bgndcolor -- color of background of each cell
