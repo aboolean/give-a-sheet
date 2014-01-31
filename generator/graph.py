@@ -61,25 +61,26 @@ def cartesian(
 
     if borderless:
         squareSection(
-                page=page,
-                location=(0,0),
-                size=pagesize,
-                gridspace=gridspace,
-                checkered=checkered,
-                rainbow=rainbow,
-                gridline=gridline,
-                boxline=0,
-                checkeredcolor=checkeredcolor,
-                gridcolor=gridcolor,
-                boxcolor=boxcolor,
-                bgndcolor=bgndcolor,
-                )
+            page=page,
+            location=(0, 0),
+            size=pagesize,
+            gridspace=gridspace,
+            linefreq=0,
+            checkered=checkered,
+            rainbow=rainbow,
+            gridline=gridline,
+            boxline=0,
+            checkeredcolor=checkeredcolor,
+            gridcolor=gridcolor,
+            boxcolor=boxcolor,
+            bgndcolor=bgndcolor,
+            )
         if guideline:
             page.setStrokeColor(grey(boxcolor))
             page.setLineWidth(guidewidth)
             page.line(guidespace, 0, guidespace, pagesize[1])
-
     else:
+
         # dimensions and layout
 
         (up_w, up_h) = (layout if layout > (0, 0) else (1, 1))
@@ -108,6 +109,7 @@ def cartesian(
                 location=loc,
                 size=(area_w, area_h),
                 gridspace=gridspace,
+                linefreq=0,
                 checkered=checkered,
                 rainbow=rainbow,
                 gridline=gridline,
@@ -140,12 +142,15 @@ def squareSection(
     location,
     size,
     gridspace,
+    linefreq,
     checkered,
     rainbow,
     gridline,
+    linewidth,
     boxline,
     checkeredcolor,
     gridcolor,
+    linecolor,
     boxcolor,
     bgndcolor,
     **excessParams
@@ -158,12 +163,15 @@ def squareSection(
     location -- location of the graph as a list of (x, y) tuple
     size -- size of the graph as (width, height) tuple
     gridspace -- size of individual grid cells
+    linefreq -- frequency of lines expressed as the number of rows per line
     checkered -- true for checkered grid
     rainbow -- true for rainbow grid
     gridline -- thickness of lines around cells
+    linewidth -- width of each writing line
     boxline -- thickness of border around graph(s), 0 for no box
     checkeredcolor -- color of checkered boxes
     gridcolor -- color of grid lines around cells
+    linecolor -- color of each line
     boxcolor -- color of box surrounding graph(s)
     bgndcolor -- color of background of each cell
     """
@@ -218,6 +226,16 @@ def squareSection(
         style.add('BOX', (0, 0), (-1, -1), boxline, grey(boxcolor))
     table.setStyle(style)
 
+    # writing lines
+
+    if linefreq != 0:
+        style = TableStyle()
+        for line in xrange(int(cells_y / linefreq) + 1):
+            rowline = line * linefreq
+            style.add('LINEABOVE', (0, rowline), (-1, rowline), linewidth,
+                      grey(linecolor))
+        table.setStyle(style)
+
     # draw graphs
 
     frame = Frame(
@@ -231,6 +249,147 @@ def squareSection(
         topPadding=0,
         )
     frame.addFromList([table], page)
+
+
+def dual(
+    filename,
+    pagesize=letter,
+    margins=0.5 * inch,
+    spacer=0.25 * inch,
+    gridspace=0.25 * inch,
+    linefreq=1,
+    gridline=0.5,
+    linewidth=1,
+    boxline=1,
+    checkered=0,
+    rainbow=0,
+    checkeredcolor=10,
+    gridcolor=20,
+    boxcolor=80,
+    linecolor=50,
+    bgndcolor=0,
+    layout=(1, 1),
+    borderless=0,
+    guideline=1,
+    guidespace=1.25 * inch,
+    guidewidth=1,
+    **excessParams
+    ):
+    """
+    Generates a page that is squared between lines.
+
+    Keyword arguments:
+    filename -- output PDF document name
+    pagesize -- size of page as (width, height) tuple
+    margins -- size of margins around page
+    spacer -- size of spacing between graphs
+    gridspace -- size of individual grid cells
+    linefreq -- frequency of lines expressed as the number of rows per line
+    gridline -- thickness of lines around cells
+    linewidth -- width of each writing line
+    boxline -- thickness of border around graph(s), 0 for no box
+    checkered -- true for checkered grid
+    rainbow -- true for rainbow grid coloring
+    checkeredcolor -- color of checkered boxes
+    gridcolor -- color of grid lines around cells
+    boxcolor -- color of box surrounding graph(s)
+    linecolor -- color of each line
+    bgndcolor -- color of background of each cell
+    layout -- number of graphs per page in (x, y) tuple
+    borderless -- overrides layout and produces end-to-end page
+    guideline -- flag for including the left margin line on borderless page
+    guidespace -- space of left margin line from page edge
+    guidewidth -- width of left margin line
+    """
+
+    page = canvas.Canvas(filename, pagesize=pagesize)
+
+    if borderless:
+        above = 1 * inch
+        below = 0.3 * inch
+        cells_y = (pagesize[1] - above - below) / gridspace
+        grid_h = cells_y * gridspace
+        loc = (0, pagesize[1] - above - grid_h)
+        size = (pagesize[1], grid_h)
+        squareSection(
+            page=page,
+            location=loc,
+            size=size,
+            gridspace=gridspace,
+            linefreq=linefreq,
+            checkered=checkered,
+            rainbow=rainbow,
+            gridline=gridline,
+            linewidth=linewidth,
+            boxline=0,
+            checkeredcolor=checkeredcolor,
+            gridcolor=gridcolor,
+            linecolor=linecolor,
+            boxcolor=boxcolor,
+            bgndcolor=bgndcolor,
+            )
+        if guideline:
+            page.setStrokeColor(grey(boxcolor))
+            page.setLineWidth(guidewidth)
+            page.line(guidespace, 0, guidespace, pagesize[1])
+    else:
+
+        # dimensions and layout
+
+        (up_w, up_h) = (layout if layout > (0, 0) else (1, 1))
+        (page_w, page_h) = pagesize
+        area_w = (page_w - 2 * margins - (up_w - 1) * spacer) / up_w
+        area_h = (page_h - 2 * margins - (up_h - 1) * spacer) / up_h
+
+        if area_w < 0 or area_h < 0:
+            raise ValueError('Specified dimensions do not fit on page.')
+
+        frame_locs = list()
+
+        x = margins  # begin after left margin
+        for frame_x in xrange(up_w):
+            y = margins  # begin above lower margin
+            for frame_y in xrange(up_h):
+                frame_locs.append((x, y))
+                y += area_h + spacer
+            x += area_w + spacer
+
+        # draw result
+
+        for loc in frame_locs:
+            squareSection(
+                page=page,
+                location=loc,
+                size=(area_w, area_h),
+                gridspace=gridspace,
+                linefreq=linefreq,
+                checkered=checkered,
+                rainbow=rainbow,
+                gridline=gridline,
+                linewidth=linewidth,
+                boxline=boxline,
+                checkeredcolor=checkeredcolor,
+                gridcolor=gridcolor,
+                linecolor=linecolor,
+                boxcolor=boxcolor,
+                bgndcolor=bgndcolor,
+                )
+
+    placeLogo(margins, pagesize, canvas, quadrant=4)
+
+    page.setTitle('Cartesian Graph Paper by Give Sheet')
+    page.setAuthor('Andre Aboulian via Give Sheet')
+    page.setSubject('Page Template')
+    page.setKeywords([
+        'graph',
+        'cartesian',
+        'givesheet',
+        'pdf',
+        'grid',
+        'template',
+        'paper',
+        ])
+    page.save()
 
 
 def dotted(
@@ -278,29 +437,30 @@ def dotted(
 
     if borderless:
         dotSection(
-                page=page,
-                location=(0,0),
-                size=pagesize,
-                gridspace=gridspace,
-                dotsize=dotsize,
-                boxline=0,
-                rainbow=rainbow,
-                dotcolor=dotcolor,
-                boxcolor=boxcolor,
-                bgndcolor=bgndcolor,
-                )
+            page=page,
+            location=(0, 0),
+            size=pagesize,
+            gridspace=gridspace,
+            dotsize=dotsize,
+            boxline=0,
+            rainbow=rainbow,
+            dotcolor=dotcolor,
+            boxcolor=boxcolor,
+            bgndcolor=bgndcolor,
+            )
         if guideline:
             page.setStrokeColor(grey(boxcolor))
             page.setLineWidth(guidewidth)
             page.line(guidespace, 0, guidespace, pagesize[1])
-
     else:
+
         # dimensions and layout
 
         (up_w, up_h) = (layout if layout > (0, 0) else (1, 1))
         (page_w, page_h) = pagesize
-        (area_w, area_h) = ((page_w - 2 * margins - (up_w - 1) * spacer) / up_w,
-                            (page_h - 2 * margins - (up_h - 1) * spacer) / up_h)
+        (area_w, area_h) = ((page_w - 2 * margins - (up_w - 1) * spacer)
+                            / up_w, (page_h - 2 * margins - (up_h - 1)
+                            * spacer) / up_h)
 
         if area_w < 0 or area_h < 0:
             raise ValueError('Specified dimensions do not fit on page.')
@@ -441,6 +601,7 @@ def dotSection(
 
 
 if __name__ == '__main__':
+
     # cartesian(
     #     'output.pdf',
     #     spacer=0.1 * inch,
@@ -457,20 +618,44 @@ if __name__ == '__main__':
     #     marginline=1,
     #     )
 
-    dotted(
-        "output.pdf",
+    # dotted(
+    #     "output.pdf",
+    #     pagesize=letter,
+    #     margins=0.5 * inch,
+    #     spacer=0.25 * inch,
+    #     gridspace=0.25 * inch,
+    #     dotsize=0.5 * mm,
+    #     boxline=1,
+    #     rainbow=0,
+    #     dotcolor=40,
+    #     boxcolor=80,
+    #     bgndcolor=0,
+    #     layout=(2,2),
+    #     borderless=1,
+    #     guideline=1,
+    #     guidespace=1.25 * inch,
+    #     guidewidth=1)
+
+    dual(
+        'output.pdf',
         pagesize=letter,
         margins=0.5 * inch,
         spacer=0.25 * inch,
         gridspace=0.25 * inch,
-        dotsize=0.5 * mm,
+        linefreq=1,
+        gridline=0.5,
+        linewidth=1,
         boxline=1,
+        checkered=0,
         rainbow=0,
-        dotcolor=40,
+        checkeredcolor=10,
+        gridcolor=20,
         boxcolor=80,
+        linecolor=50,
         bgndcolor=0,
-        layout=(2,2),
+        layout=(1, 1),
         borderless=1,
         guideline=1,
         guidespace=1.25 * inch,
-        guidewidth=1)
+        guidewidth=1,
+        )
